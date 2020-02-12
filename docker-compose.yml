@@ -55,6 +55,28 @@ services:
     command: ["consul", "connect", "envoy","-sidecar-for", "expense-db-mssql"]
     network_mode: "service:expense-db-mssql"
 
+  consul_template:
+    image: hashicorp/consul-template:light
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.11
+    environment:
+      CONSUL_HTTP_ADDR: 10.5.0.2:8500
+      CT_LOCAL_CONFIG: |
+        template {
+          contents = <<EOH
+        {{ range ls "toggles" }}
+        {{ .Key }}={{ .Value }}{{ end }}
+        EOH
+          destination = "/tmp/toggles"
+          wait {
+            min = "2s"
+            max = "5s"
+          }
+        }
+    volumes:
+      - "./report:/tmp"
+
   jaeger:
     image: jaegertracing/all-in-one:1.13
     environment:

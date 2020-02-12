@@ -64,3 +64,9 @@ traffic:
 clean-traffic:
 	consul config delete -kind service-splitter -name expense
 	consul config delete -kind service-resolver -name expense
+
+toggle-on:
+	consul kv put toggles/enable-number-of-items true
+
+toggle-off:
+	consul kv put toggles/enable-number-of-items false
