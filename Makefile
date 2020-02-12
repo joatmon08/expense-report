@@ -11,8 +11,11 @@ build:
 	docker build -t joatmon08/report:dotnet -f report/dotnet/Dockerfile .
 
 push:
+	docker push joatmon08/expense-db:mssql
 	docker push joatmon08/expense-db:mysql
 	docker push joatmon08/expense:java
+	docker push joatmon08/expense:dotnet
+	docker push joatmon08/report:dotnet 
 
 circuit-break: clean-traffic
 	sed 's/CONSUL_FQDN/${CONSUL_DOMAIN}/g' circuit_breaking/template.tpl > circuit_breaking/report.hcl
