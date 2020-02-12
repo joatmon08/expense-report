@@ -4,8 +4,9 @@ CONSUL_HTTP_ADDR = http://localhost:8500
 CONSUL_DOMAIN := $(shell curl -s http://localhost:8500/v1/connect/ca/roots | jq -r .TrustDomain)
 
 build:
-	docker build  --no-cache -t joatmon08/expense-db:mysql database/mysql/
-	docker build -t joatmon08/expense:java -f expense/Dockerfile.java expense/
+	docker build -t joatmon08/expense-db:mssql database/mssql/
+	docker build -t joatmon08/expense-db:mysql database/mysql/
+	docker build -t joatmon08/expense:java expense/java/
 
 push:
 	docker push joatmon08/expense-db:mysql
@@ -31,7 +32,7 @@ db-run: clean build
 consul:
 	docker-compose up -d
 	until consul info; do sleep 10; done
-	consul kv put configuration/expense/application.properties @expense/application.properties
+	consul kv put configuration/expense/application.properties @expense/java/application.properties
 
 expense-java:
 	docker-compose -f docker-compose-expense.yml up -d
