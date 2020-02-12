@@ -14,18 +14,18 @@ push:
 	docker push joatmon08/expense-db:mysql
 	docker push joatmon08/expense:java
 
-circuit-break:
+circuit-break: clean-traffic
 	sed 's/CONSUL_FQDN/${CONSUL_DOMAIN}/g' circuit_breaking/template.tpl > circuit_breaking/report.hcl
-	docker-compose -f circuit-break.yml up -d
+	docker-compose -f docker-compose-circuit-break.yml up -d
 
 circuit-break-test:
-	docker stop java-service-mesh-example_expense-db-mssql_1
+	docker stop expense-report_expense-db-mssql_1
 	for i in {1..50}; do curl -s -o /dev/null -w "%{http_code}" localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d09544; echo ""; sleep 1; done
 
 clean-circuit-break:
-	docker start java-service-mesh-example_expense-db-mssql_1
-	docker restart java-service-mesh-example_expensedb_proxy_mssql_1
-	docker-compose -f circuit-break.yml down || true
+	docker start expense-report_expense-db-mssql_1
+	docker restart expense-report_expensedb_proxy_mssql_1
+	docker-compose -f docker-compose-circuit-break.yml down || true
 	rm -f circuit_breaking/report.hcl
 
 db-run: clean build
@@ -33,8 +33,7 @@ db-run: clean build
 
 consul:
 	docker-compose up -d
-	until consul info; do sleep 10; done
-	consul kv put configuration/expense/application.properties @expense/java/application.properties
+	until consul kv put configuration/expense/application.properties @expense/java/application.properties; do sleep 10; done
 
 expense-app:
 	docker-compose -f docker-compose-expense.yml up -d
@@ -48,13 +47,17 @@ report-app:
 clean-report-app:
 	docker-compose -f docker-compose-report.yml down || true
 
-clean: clean-report-app clean-expense-app
+clean: clean-circuit-break clean-report-app clean-expense-app
 	docker-compose down || true
 	docker rm -f expenses-db expenses || true
 
 get-envoy-config:
-	 docker exec expense-report_expensedb_proxy_1 curl localhost:19000/config_dump | jq '.configs[2].dynamic_active_listeners[0].listener.filter_chains[0].tls_context'
+	 docker exec expense-report_expensedb_proxy_mysql_1 curl localhost:19000/config_dump | jq '.configs[2].dynamic_active_listeners[0].listener.filter_chains[0].tls_context'
 
 traffic:
 	consul config write traffic_config/expense-resolver.hcl
 	consul config write traffic_config/expense-splitter.hcl
+
+clean-traffic:
+	consul config delete -kind service-splitter -name expense
+	consul config delete -kind service-resolver -name expense
