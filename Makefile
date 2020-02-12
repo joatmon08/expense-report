@@ -48,12 +48,12 @@ report-app:
 clean-report-app:
 	docker-compose -f docker-compose-report.yml down || true
 
-clean: clean-expense-app
+clean: clean-report-app clean-expense-app
 	docker-compose down || true
 	docker rm -f expenses-db expenses || true
 
 get-envoy-config:
-	 docker exec java-service-mesh-example_expensedb_proxy_1 curl localhost:19000/config_dump | jq '.configs[2].dynamic_active_listeners[0].listener.filter_chains[0].tls_context'
+	 docker exec expense-report_expensedb_proxy_1 curl localhost:19000/config_dump | jq '.configs[2].dynamic_active_listeners[0].listener.filter_chains[0].tls_context'
 
 traffic:
 	consul config write traffic_config/expense-resolver.hcl
