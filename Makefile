@@ -1,7 +1,8 @@
 .EXPORT_ALL_VARIABLES:
-
 CONSUL_HTTP_ADDR = http://localhost:8500
 CONSUL_DOMAIN := $(shell curl -s http://localhost:8500/v1/connect/ca/roots | jq -r .TrustDomain)
+
+all: consul expense-app
 
 build:
 	docker build -t joatmon08/expense-db:mssql database/mssql/
@@ -17,7 +18,7 @@ push:
 	docker push joatmon08/expense:dotnet
 	docker push joatmon08/report:dotnet 
 
-circuit-break: clean-traffic
+circuit-break: clean-traffic clean-report-app
 	sed 's/CONSUL_FQDN/${CONSUL_DOMAIN}/g' circuit_breaking/template.tpl > circuit_breaking/report.hcl
 	docker-compose -f docker-compose-circuit-break.yml up -d
 
@@ -44,7 +45,7 @@ expense-app:
 clean-expense-app:
 	docker-compose -f docker-compose-expense.yml down || true
 
-report-app:
+report-app: clean-circuit-break
 	docker-compose -f docker-compose-report.yml up -d
 
 clean-report-app:
