@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: expense
+  cloud:
+    consul:
+      config:
+        enabled: true
+        prefix: configuration/expense
+        format: FILES
