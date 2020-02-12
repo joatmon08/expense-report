@@ -31,6 +31,27 @@ services:
       - "./consul_agent_config:/config"
     network_mode: "service:expense-java"
 
+  expense-dotnet:
+    image: joatmon08/expense:dotnet
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.7
+    ports:
+      - 5001:5001
+  expense_proxy_dotnet:
+    image: joatmon08/consul-envoy:1.6.3-1.11.1
+    restart: always
+    environment:
+      CONSUL_HTTP_ADDR: 10.5.0.2:8500
+      CONSUL_GRPC_ADDR: 10.5.0.2:8502
+      SERVICE_CONFIG: /config/expense-dotnet.hcl
+      CENTRAL_CONFIG_DIR: /central_config
+    volumes:
+      - "./service_config:/config"
+      - "./central_config:/central_config"
+    command: ["consul", "connect", "envoy","-sidecar-for", "expense-dotnet"]
+    network_mode: "service:expense-dotnet"
+
 networks:
   vpcbr:
     external:

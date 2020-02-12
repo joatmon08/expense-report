@@ -33,6 +33,28 @@ services:
     command: ["consul", "connect", "envoy","-sidecar-for", "expense-db-mysql"]
     network_mode: "service:expense-db-mysql"
 
+  expense-db-mssql:
+    image: joatmon08/expense-db:mssql
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.6
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Testing!123
+  expensedb_proxy_mssql:
+    image: joatmon08/consul-envoy:1.6.3-1.11.1
+    restart: always
+    environment:
+      CONSUL_HTTP_ADDR: 10.5.0.2:8500
+      CONSUL_GRPC_ADDR: 10.5.0.2:8502
+      SERVICE_CONFIG: /config/expensedb-mssql.hcl
+    volumes:
+      - "./service_config:/config"
+    command: ["consul", "connect", "envoy","-sidecar-for", "expense-db-mssql"]
+    network_mode: "service:expense-db-mssql"
+
   jaeger:
     image: jaegertracing/all-in-one:1.13
     environment:

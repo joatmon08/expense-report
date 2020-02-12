@@ -7,6 +7,8 @@ build:
 	docker build -t joatmon08/expense-db:mssql database/mssql/
 	docker build -t joatmon08/expense-db:mysql database/mysql/
 	docker build -t joatmon08/expense:java expense/java/
+	docker build -t joatmon08/expense:dotnet expense/dotnet/
+	docker build -t joatmon08/report:dotnet -f report/dotnet/Dockerfile .
 
 push:
 	docker push joatmon08/expense-db:mysql
@@ -34,13 +36,19 @@ consul:
 	until consul info; do sleep 10; done
 	consul kv put configuration/expense/application.properties @expense/java/application.properties
 
-expense-java:
+expense-app:
 	docker-compose -f docker-compose-expense.yml up -d
 
-clean-expense:
+clean-expense-app:
 	docker-compose -f docker-compose-expense.yml down || true
 
-clean: clean-expense
+report-app:
+	docker-compose -f docker-compose-report.yml up -d
+
+clean-report-app:
+	docker-compose -f docker-compose-report.yml down || true
+
+clean: clean-expense-app
 	docker-compose down || true
 	docker rm -f expenses-db expenses || true
 

@@ -20,3 +20,9 @@ gradle-app.setting
 bin/
 
 circuit_breaking/report.hcl
+
+# .NET
+.vscode
+bin/
+obj/
+report/toggles
