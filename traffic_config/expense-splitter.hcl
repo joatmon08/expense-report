@@ -4,11 +4,11 @@ name = "expense"
 
 splits = [
   {
-    weight = 90,
+    weight = 20,
     service_subset = "dotnet"
   },
   {
-    weight = 10,
+    weight = 80,
     service_subset = "java"
   }
 ]

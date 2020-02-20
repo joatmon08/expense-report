@@ -60,6 +60,8 @@ get-envoy-config:
 
 traffic:
 	consul config write traffic_config/expense-resolver.hcl
+	sleep 10
+	curl -X GET 'http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa'
 	consul config write traffic_config/expense-splitter.hcl
 
 clean-traffic:
@@ -71,3 +73,13 @@ toggle-on:
 
 toggle-off:
 	consul kv put toggles/enable-number-of-items false
+
+router-on:
+	consul config write traffic_config/expense-resolver.hcl
+	sleep 10
+	curl -X GET 'http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa'
+	consul config write traffic_config/expense-router.hcl
+
+router-off:
+	consul config delete -kind service-router -name expense
+	consul config delete -kind service-resolver -name expense
