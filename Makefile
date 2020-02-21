@@ -56,7 +56,7 @@ clean: clean-circuit-break clean-report-app clean-expense-app
 	docker rm -f expenses-db expenses || true
 
 get-envoy-config:
-	 docker exec expense-report_expensedb_proxy_mysql_1 curl localhost:19000/config_dump | jq '.configs[2].dynamic_active_listeners[0].listener.filter_chains[0].tls_context'
+	 docker exec expense-report_expensedb_proxy_mysql_1 curl -s localhost:19000/config_dump | jq '.configs[2].dynamic_active_listeners[0].listener.filter_chains[0].tls_context'
 
 traffic:
 	consul config write traffic_config/expense-resolver.hcl
@@ -83,3 +83,6 @@ router-on:
 router-off:
 	consul config delete -kind service-router -name expense
 	consul config delete -kind service-resolver -name expense
+
+make test:
+	curl -s -X GET 'http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa' | jq '.'
