@@ -1,6 +1,3 @@
-kind = "service-defaults"
-name = "expense"
-protocol = "http"
-MeshGateway = {
-  mode = "local"
-}
+Kind = "service-defaults"
+Name = "expense"
+Protocol = "http"

@@ -1,6 +1,4 @@
-# A/B test
 kind = "service-router"
-
 name = "expense"
 
 routes = [
@@ -9,8 +7,8 @@ routes = [
       http {
         header = [
           {
-            name  = "testgroup"
-            exact = "b"
+            name  = "X-Request-ID"
+            regex  = "^[a-z].*"
           },
         ]
       }
@@ -20,16 +18,5 @@ routes = [
       service        = "expense"
       service_subset = "java"
     }
-  },
-  {
-    match {
-      http {
-        path_prefix = "/"
-      }
-    }
-
-    destination {
-      service = "expense"
-    }
-  },
+  }
 ]

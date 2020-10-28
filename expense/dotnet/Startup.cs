@@ -11,6 +11,7 @@ using zipkin4net;
 using zipkin4net.Tracers.Zipkin;
 using zipkin4net.Transport.Http;
 using zipkin4net.Middleware;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Expense
 {
@@ -28,7 +29,7 @@ namespace Expense
       IStatistics statistics = new Statistics();
       TraceManager.SamplingRate = 1.0f;
       var httpSender = new HttpZipkinSender(connection, "application/json");
-      return new ZipkinTracer(httpSender, new JSONSpanSerializer (), statistics);
+      return new ZipkinTracer(httpSender, new JSONSpanSerializer(), statistics);
     }
 
     // This method gets called by the runtime. Use this method to add services to the container.
@@ -41,7 +42,13 @@ namespace Expense
       services.AddTransient<IVersionContext>(s => new VersionContext(Configuration.GetValue<string>("version")));
       services.AddLogging(opt =>
       {
-            opt.AddConsole();
+        opt.AddConsole();
+      });
+
+      services.Configure<ForwardedHeadersOptions>(options =>
+      {
+        options.ForwardedHeaders =
+            ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
       });
     }
 
@@ -51,22 +58,25 @@ namespace Expense
       if (env.IsDevelopment())
       {
         app.UseDeveloperExceptionPage();
+        app.UseForwardedHeaders();
       }
       else
       {
         // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
         app.UseHsts();
+        app.UseForwardedHeaders();
       }
 
-      var lifetime = app.ApplicationServices.GetService<IApplicationLifetime> ();
+      var lifetime = app.ApplicationServices.GetService<IApplicationLifetime>();
       IStatistics statistics = new Statistics();
 
-      lifetime.ApplicationStarted.Register (() => {
-          var logger = new TracingLogger(loggerFactory, "zipkin4net");
-          var tracer = ConfigureTracer(Configuration.GetConnectionString("Zipkin"));
-          TraceManager.Trace128Bits = true;
-          TraceManager.RegisterTracer(tracer);
-          TraceManager.Start(logger);
+      lifetime.ApplicationStarted.Register(() =>
+      {
+        var logger = new TracingLogger(loggerFactory, "zipkin4net");
+        var tracer = ConfigureTracer(Configuration.GetConnectionString("Zipkin"));
+        TraceManager.Trace128Bits = true;
+        TraceManager.RegisterTracer(tracer);
+        TraceManager.Start(logger);
       });
 
       lifetime.ApplicationStopped.Register(() => TraceManager.Stop());

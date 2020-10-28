@@ -1,4 +1,4 @@
-data_dir = "/tmp/"
+data_dir  = "/tmp/"
 log_level = "INFO"
 
 datacenter = "dc1"
