@@ -1,11 +1,17 @@
 global:
-  scrape_interval:     15s
+  scrape_interval: 15s
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: 'envoy'
+  - job_name: "envoy"
     metrics_path: /metrics
-    static_configs:
-      - targets: ['10.5.0.3:9102', '10.5.0.4:9102', '10.5.0.5:9102', '10.5.0.6:9102', '10.5.0.7:9102']
-        labels:
-          group: 'envoy'
+    consul_sd_configs:
+      - server: 10.5.0.2:8500
+        tags:
+          - expense-report
+    relabel_configs:
+      - source_labels: [__meta_consul_service_address]
+        regex: "(.*)"
+        replacement: "${1}:9102"
+        target_label: "__address__"
+        action: "replace"

@@ -10,20 +10,18 @@ services:
     volumes:
       - "./report:/etc/report"
   report_proxy:
-    image: joatmon08/consul-envoy:v1.9.0-v1.16.0
+    image: joatmon08/consul-envoy:v1.9.5-v1.16.2
     restart: always
     environment:
       CONSUL_HTTP_ADDR: 10.5.0.2:8500
       CONSUL_GRPC_ADDR: 10.5.0.2:8502
       SERVICE_CONFIG: /config/report-dotnet.hcl
-      CENTRAL_CONFIG_DIR: /central_config
     volumes:
       - "./service_config:/config"
-      - "./central_config:/central_config"
     command: ["consul", "connect", "envoy","-sidecar-for", "report-dotnet"]
     network_mode: "service:report"
   report_agent:
-    image: consul:1.9.0-beta1
+    image: consul:1.9.5
     restart: always
     command: ["consul","agent","-config-file=/config/agent.hcl","-config-dir=/config"]
     volumes:

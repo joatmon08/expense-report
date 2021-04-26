@@ -3,8 +3,17 @@ service {
   id      = "report-dotnet"
   address = "10.5.0.5"
   port    = 5002
+  checks = [
+    {
+      id       = "http"
+      name     = "HTTP on port 5002"
+      tcp      = "10.5.0.5:5002"
+      interval = "30s"
+      timeout  = "60s"
+    }
+  ]
 
-  tags = ["dotnet"]
+  tags = ["dotnet", "expense-report"]
   meta = {
     framework = "dotnet"
   }
@@ -24,8 +33,8 @@ service {
           destination_name   = "expense"
           local_bind_address = "127.0.0.1"
           local_bind_port    = 5001
-
           config {
+            protocol           = "http"
             connect_timeout_ms = 5000
             limits {
               max_connections         = 3
@@ -37,6 +46,10 @@ service {
               max_failures = 10
             }
           }
+        }
+        config {
+          protocol                   = "http"
+          envoy_prometheus_bind_addr = "0.0.0.0:9102"
         }
       }
     }

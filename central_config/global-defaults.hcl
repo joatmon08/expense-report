@@ -2,6 +2,7 @@ kind = "proxy-defaults"
 name = "global"
 
 config {
+  protocol                   = "http"
   envoy_prometheus_bind_addr = "0.0.0.0:9102"
 
   envoy_extra_static_clusters_json = <<EOL
@@ -18,7 +19,7 @@ config {
                           "endpoint": {
                               "address": {
                                   "socket_address": {
-                                      "address": "jaeger",
+                                      "address": "10.5.0.10",
                                       "port_value": 9411,
                                       "protocol": "TCP"
                                   }
@@ -38,8 +39,9 @@ config {
     {
         "http": {
             "config": {
+                "@type": type.googleapis.com/envoy.config.trace.v3.ZipkinConfig
                 "collector_cluster": "jaeger_9411",
-                "collector_endpoint": "/api/v1/spans"
+                "collector_endpoint": "/api/v2/spans"
             },
             "name": "envoy.zipkin"
         }
