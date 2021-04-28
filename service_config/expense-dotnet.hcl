@@ -5,7 +5,7 @@ service {
   port    = 5001
   checks = [
     {
-      id       = "http"
+      id       = "expense-dotnet-http"
       name     = "HTTP on port 5001"
       tcp      = "10.5.0.7:5001"
       interval = "30s"
@@ -24,6 +24,7 @@ service {
 
       check {
         name     = "Connect Envoy Sidecar"
+        id       = "expense-dotnet-sidecar-proxy-check"
         tcp      = "10.5.0.7:20000"
         interval = "10s"
       }

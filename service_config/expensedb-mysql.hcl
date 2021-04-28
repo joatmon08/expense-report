@@ -5,7 +5,7 @@ service {
   port    = 3306
   checks = [
     {
-      id       = "tcp"
+      id       = "expense-db-mysql-tcp"
       name     = "TCP on port 3306"
       tcp      = "10.5.0.3:3306"
       interval = "30s"
@@ -24,6 +24,7 @@ service {
 
       check {
         name     = "Connect Envoy Sidecar"
+        id       = "expense-db-mysql-sidecar-proxy-check"
         tcp      = "10.5.0.3:20000"
         interval = "10s"
       }

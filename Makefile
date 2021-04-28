@@ -70,7 +70,7 @@ toggle-off:
 router-on:
 	consul config write traffic_config/expense-resolver.hcl
 	sleep 10
-	curl -X GET 'http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa'
+	curl -X GET 'http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa' | jq '.'
 	consul config write traffic_config/expense-router.hcl
 
 router-off:
@@ -82,3 +82,7 @@ write-expense:
 
 test-report:
 	curl -s -X GET 'http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa' | jq '.'
+
+test-router:
+	docker exec -it expense-report_report_1 curl -H 'X-Request-ID:java' localhost:5001/api/expense | jq '.'
+	docker exec -it expense-report_report_1 curl localhost:5001/api/expense | jq '.'

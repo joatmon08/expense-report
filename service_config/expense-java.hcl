@@ -5,7 +5,7 @@ service {
   port    = 8080
   checks = [
     {
-      id       = "http"
+      id       = "expense-java-http"
       name     = "HTTP on port 8080"
       tcp      = "10.5.0.4:8080"
       interval = "30s"
@@ -24,6 +24,7 @@ service {
 
       check {
         name     = "Connect Envoy Sidecar"
+        id       = "expense-java-sidecar-proxy-check"
         tcp      = "10.5.0.4:20000"
         interval = "10s"
       }
