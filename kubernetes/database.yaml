@@ -46,6 +46,7 @@ spec:
         prometheus.io/scrape: "true"
         consul.hashicorp.com/connect-inject: "true"
         consul.hashicorp.com/service-meta-framework: mssql
+        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
       labels:
         app: expense-db-mssql
         framework: mssql

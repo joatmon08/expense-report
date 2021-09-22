@@ -93,3 +93,17 @@ k8s-consul:
 k8s-jaeger:
 	kubectl apply -f kubernetes/jaeger.yaml
 	kubectl apply -f kubernetes/proxy-defaults.yaml
+
+k8s-app:
+	kubectl apply -f kubernetes/database.yaml
+	kubectl apply -f kubernetes/expense.yaml
+	kubectl apply -f kubernetes/report.yaml
+
+clean-k8s-app:
+	kubectl delete -f kubernetes/report.yaml || true
+	kubectl delete -f kubernetes/expense.yaml || true
+	kubectl delete -f kubernetes/database.yaml
+
+clean-k8s-jaeger:
+	kubectl delete -f kubernetes/jaeger.yaml || true
+	kubectl delete -f kubernetes/proxy-defaults.yaml || true

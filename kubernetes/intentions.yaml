@@ -1,0 +1,15 @@
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: report-to-expense
+spec:
+  destination:
+    name: expense
+  sources:
+    - name: report
+      permissions:
+        - action: allow
+          http:
+            pathExact: /api
+            methods: ["GET"]

@@ -4,7 +4,6 @@ using Report.Models;
 using Expense.Client;
 using System.Collections.Generic;
 using Expense.Models;
-using Toggle;
 
 namespace expense.Controllers
 {
@@ -14,12 +13,10 @@ namespace expense.Controllers
   public class ReportController : ControllerBase
   {
     private readonly IExpenseClient _client;
-    private readonly IToggleClient _toggleClient;
 
-    public ReportController(IExpenseClient client, IToggleClient toggleClient)
+    public ReportController(IExpenseClient client)
     {
       _client = client;
-      _toggleClient = toggleClient;
     }
 
     [HttpGet("expense/version")]
@@ -82,17 +79,12 @@ namespace expense.Controllers
 
     private void addNumItems(ReportTotal reportTotal)
     {
-      if (_toggleClient.GetToggleValue("enable-number-of-items").Result)
-      {
         reportTotal.NumberOfExpenses = reportTotal.Expenses.Count;
-      }
     }
 
     private void addTotalReimbursable(ReportTotal reportTotal, IList<ExpenseItem> items)
     {
-      if (_toggleClient.ToggleForExperiment("expense").Result) {
-        reportTotal.TotalReimbursable = getTotalReimbursable(items);;
-      }
+      reportTotal.TotalReimbursable = getTotalReimbursable(items);;
     }
   }
 }

@@ -28,19 +28,13 @@ spec:
         app.kubernetes.io/component: all-in-one
       annotations:
         prometheus.io/scrape: "true"
-        consul.hashicorp.com/connect-inject: "true"
-        consul.hashicorp.com/connect-service: "jaeger"
-        consul.hashicorp.com/enable-metrics-merging: "true"
-        consul.hashicorp.com/service-metrics-port: "16686"
-        consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "16686"
+        prometheus.io/port: "16686"
     spec:
       serviceAccountName: jaeger
       containers:
-        - env:
-            - name: COLLECTOR_ZIPKIN_HTTP_PORT
-              value: "9411"
-          image: jaegertracing/all-in-one
-          name: jaeger
+        - name: jaeger
+          image: jaegertracing/all-in-one:1.26
+          args: ["--collector.zipkin.host-port=:9411"]
           ports:
             - containerPort: 5775
               protocol: UDP
@@ -82,13 +76,17 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: jaeger-collector
+  name: jaeger
   labels:
     app: jaeger
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: collector
 spec:
   ports:
+    - name: jaeger
+      port: 9411
+      protocol: TCP
+      targetPort: 9411
     - name: jaeger-collector-tchannel
       port: 14267
       protocol: TCP
@@ -97,10 +95,6 @@ spec:
       port: 14268
       protocol: TCP
       targetPort: 14268
-    - name: jaeger-collector-zipkin
-      port: 9411
-      protocol: TCP
-      targetPort: 9411
   selector:
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: all-in-one
@@ -136,33 +130,3 @@ spec:
   selector:
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: all-in-one
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: jaeger
-  labels:
-    app: jaeger
-    app.kubernetes.io/name: jaeger
-    app.kubernetes.io/component: zipkin
-spec:
-  ports:
-    - name: jaeger-collector-zipkin
-      port: 9411
-      protocol: TCP
-      targetPort: 9411
-  clusterIP: None
-  selector:
-    app.kubernetes.io/name: jaeger
-    app.kubernetes.io/component: all-in-one
----
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
-metadata:
-  name: jaeger
-spec:
-  destination:
-    name: jaeger
-  sources:
-    - name: "*"
-      action: allow

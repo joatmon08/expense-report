@@ -1,0 +1,76 @@
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: report-to-expense
+spec:
+  destination:
+    name: expense
+  sources:
+    - name: report
+      permissions:
+        - action: allow
+          http:
+            pathPrefix: /api/expense/trip
+            methods: ["GET"]
+        - action: allow
+          http:
+            pathExact: /api
+            methods: ["GET"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: report
+  labels:
+    app: report
+spec:
+  selector:
+    app: report
+  type: LoadBalancer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5002
+      targetPort: 5002
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: report
+automountServiceAccountToken: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report
+  labels:
+    app: report
+    release: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: report
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "5002"
+        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
+      labels:
+        app: report
+        framework: dotnet
+    spec:
+      serviceAccountName: report
+      containers:
+        - name: report
+          image: "joatmon08/report:dotnet-v2"
+          ports:
+            - containerPort: 5002
+          livenessProbe:
+            tcpSocket:
+              port: 5002
+            initialDelaySeconds: 30
+            periodSeconds: 60
