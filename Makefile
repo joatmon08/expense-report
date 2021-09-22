@@ -86,3 +86,10 @@ test-report:
 test-router:
 	docker exec -it expense-report_report_1 curl -H 'X-Request-ID:java' localhost:5001/api/expense | jq '.'
 	docker exec -it expense-report_report_1 curl localhost:5001/api/expense | jq '.'
+
+k8s-consul:
+	helm install consul hashicorp/consul -f helm/consul.yaml
+
+k8s-jaeger:
+	kubectl apply -f kubernetes/jaeger.yaml
+	kubectl apply -f kubernetes/proxy-defaults.yaml
