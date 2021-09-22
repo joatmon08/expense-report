@@ -28,9 +28,10 @@ spec:
         app.kubernetes.io/component: all-in-one
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "16686"
         consul.hashicorp.com/connect-inject: "true"
         consul.hashicorp.com/connect-service: "jaeger"
+        consul.hashicorp.com/enable-metrics-merging: "true"
+        consul.hashicorp.com/service-metrics-port: "16686"
         consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "16686"
     spec:
       serviceAccountName: jaeger

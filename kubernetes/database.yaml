@@ -1,0 +1,68 @@
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: expense-db-mssql
+spec:
+  protocol: tcp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expense-db-mssql
+  labels:
+    app: expense-db-mssql
+    framework: mssql
+spec:
+  selector:
+    app: expense-db-mssql
+    framework: mssql
+  ports:
+    - name: http
+      protocol: TCP
+      port: 1433
+      targetPort: 1433
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: expense-db-mssql
+automountServiceAccountToken: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expense-db-mssql
+  labels:
+    app: expense-db-mssql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expense-db-mssql
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/service-meta-framework: mssql
+      labels:
+        app: expense-db-mssql
+        framework: mssql
+    spec:
+      serviceAccountName: expense-db-mssql
+      containers:
+        - name: expense-db-mssql
+          image: "joatmon08/expense-db:mssql"
+          ports:
+            - containerPort: 1433
+          env:
+            - name: ACCEPT_EULA
+              value: "y"
+            - name: SA_PASSWORD
+              value: "Testing!123"
+          livenessProbe:
+            tcpSocket:
+              port: 1433
+            initialDelaySeconds: 30
+            periodSeconds: 60
