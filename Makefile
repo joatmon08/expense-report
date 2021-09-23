@@ -91,8 +91,9 @@ k8s-consul:
 	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
 
 k8s-jaeger:
-	kubectl apply -f kubernetes/jaeger.yaml
 	kubectl apply -f kubernetes/proxy-defaults.yaml
+	kubectl apply -f kubernetes/jaeger.yaml
+	kubectl apply -f kubernetes/intentions.yaml
 
 k8s-ingress:
 	kubectl apply -f kubernetes/ingress-gateway.yaml
@@ -127,8 +128,9 @@ clean-k8s-ingress:
 	kubectl delete -f kubernetes/ingress-gateway.yaml
 
 clean-k8s-jaeger:
-	kubectl delete -f kubernetes/proxy-defaults.yaml || true
+	kubectl delete -f kubernetes/intentions.yaml || true
 	kubectl delete -f kubernetes/jaeger.yaml
+	kubectl delete -f kubernetes/proxy-defaults.yaml || true
 
 clean-consul:
 	helm del consul || true
