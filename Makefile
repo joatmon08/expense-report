@@ -88,22 +88,62 @@ test-router:
 	docker exec -it expense-report_report_1 curl localhost:5001/api/expense | jq '.'
 
 k8s-consul:
-	helm install consul hashicorp/consul -f helm/consul.yaml
+	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
 
 k8s-jaeger:
 	kubectl apply -f kubernetes/jaeger.yaml
 	kubectl apply -f kubernetes/proxy-defaults.yaml
 
-k8s-app:
-	kubectl apply -f kubernetes/database.yaml
+k8s-ingress:
+	kubectl apply -f kubernetes/ingress-gateway.yaml
+
+k8s-java:
+	kubectl apply -f kubernetes/database-mysql.yaml
 	kubectl apply -f kubernetes/expense.yaml
+	kubectl apply -f kubernetes/expense-v2.yaml
+
+k8s-report:
 	kubectl apply -f kubernetes/report.yaml
 
-clean-k8s-app:
-	kubectl delete -f kubernetes/report.yaml || true
+k8s-dotnet:
+	kubectl apply -f kubernetes/database-mssql.yaml
+	kubectl apply -f kubernetes/expense.yaml
+	kubectl apply -f kubernetes/expense-v1.yaml
+
+clean-k8s-java:
+	kubectl delete -f kubernetes/expense-v2.yaml || true
 	kubectl delete -f kubernetes/expense.yaml || true
-	kubectl delete -f kubernetes/database.yaml
+	kubectl delete -f kubernetes/database-mysql.yaml
+
+clean-k8s-dotnet:
+	kubectl delete -f kubernetes/expense-v1.yaml || true
+	kubectl delete -f kubernetes/expense.yaml || true
+	kubectl delete -f kubernetes/database-mssql.yaml
+
+clean-k8s-report:
+	kubectl delete -f kubernetes/report.yaml
+
+clean-k8s-ingress:
+	kubectl delete -f kubernetes/ingress-gateway.yaml
 
 clean-k8s-jaeger:
-	kubectl delete -f kubernetes/jaeger.yaml || true
 	kubectl delete -f kubernetes/proxy-defaults.yaml || true
+	kubectl delete -f kubernetes/jaeger.yaml
+
+clean-consul:
+	helm del consul || true
+	kubectl delete --ignore-not-found $(shell kubectl get pvc -l chart=consul-helm -o name)
+	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)
+	kubectl delete --ignore-not-found serviceaccount consul-tls-init
+
+k8s-get-expense:
+	curl -s -H 'Host:expense.ingress.consul' \
+		http://$(shell kubectl get svc consul-ingress-gateway -o jsonpath="{.status.loadBalancer.ingress[*].ip}"):8080/api/expense
+
+k8s-create-expense:
+	curl -s -X POST -H 'Host:expense.ingress.consul' -H 'Content-Type:application/json' -d @example/expense.json \
+		http://$(shell kubectl get svc consul-ingress-gateway -o jsonpath="{.status.loadBalancer.ingress[*].ip}"):8080/api/expense | jq .
+
+k8s-get-report:
+	curl -s -H 'Host:report.ingress.consul'  \
+		http://$(shell kubectl get svc consul-ingress-gateway -o jsonpath="{.status.loadBalancer.ingress[*].ip}"):8080/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .

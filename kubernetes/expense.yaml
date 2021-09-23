@@ -1,15 +1,4 @@
 ---
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
-metadata:
-  name: expense-to-db
-spec:
-  destination:
-    name: expense-db-mssql
-  sources:
-    - name: expense
-      action: allow
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -30,41 +19,3 @@ kind: ServiceAccount
 metadata:
   name: expense
 automountServiceAccountToken: true
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: expense
-  labels:
-    app: expense
-    release: v1
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: expense
-  template:
-    metadata:
-      annotations:
-        prometheus.io/scrape: "true"
-        consul.hashicorp.com/connect-inject: "true"
-        consul.hashicorp.com/connect-service-upstreams: "expense-db-mssql:1433"
-        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
-        consul.hashicorp.com/service-meta-version: v1
-      labels:
-        app: expense
-        release: v1
-        framework: dotnet
-    spec:
-      serviceAccountName: expense
-      containers:
-        - name: expense
-          image: "joatmon08/expense:dotnet"
-          ports:
-            - containerPort: 5001
-          livenessProbe:
-            httpGet:
-              path: /api
-              port: 5001
-            initialDelaySeconds: 3
-            periodSeconds: 3

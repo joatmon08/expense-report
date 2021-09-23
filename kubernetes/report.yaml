@@ -1,23 +1,4 @@
 ---
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
-metadata:
-  name: report-to-expense
-spec:
-  destination:
-    name: expense
-  sources:
-    - name: report
-      permissions:
-        - action: allow
-          http:
-            pathPrefix: /api/expense/trip
-            methods: ["GET"]
-        - action: allow
-          http:
-            pathExact: /api
-            methods: ["GET"]
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -27,7 +8,6 @@ metadata:
 spec:
   selector:
     app: report
-  type: LoadBalancer
   ports:
     - name: http
       protocol: TCP

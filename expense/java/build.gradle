@@ -12,10 +12,13 @@ repositories {
 	mavenCentral()
 }
 
+springBoot {
+	buildInfo()
+}
+
 dependencies {
 	compile 'org.springframework.cloud:spring-cloud-sleuth-zipkin:2.2.1.RELEASE'
 	compile 'io.zipkin.brave:brave-instrumentation-mysql8:5.9.3'
-	compile 'org.springframework.cloud:spring-cloud-starter-consul-config:2.2.1.RELEASE'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	runtimeOnly 'mysql:mysql-connector-java'
