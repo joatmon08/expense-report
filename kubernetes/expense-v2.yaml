@@ -27,20 +27,22 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: expense
+  name: expense-v2
   labels:
     app: expense
-    release: v1
+    release: v2
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: expense
+      release: v2
   template:
     metadata:
       annotations:
         prometheus.io/scrape: "true"
         consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/connect-service: "expense"
         consul.hashicorp.com/connect-service-upstreams: "expense-db-mysql:3306"
         consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
         consul.hashicorp.com/service-meta-version: v2

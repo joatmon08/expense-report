@@ -22,6 +22,7 @@ spec:
   selector:
     matchLabels:
       app: expense
+      release: v1
   template:
     metadata:
       annotations:

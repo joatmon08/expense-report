@@ -129,6 +129,7 @@ clean-k8s-ingress:
 	kubectl delete -f kubernetes/ingress-gateway.yaml
 
 clean-k8s-jaeger:
+	kubectl delete -f kubernetes/splitter.yaml || true
 	kubectl delete -f kubernetes/intentions.yaml || true
 	kubectl delete -f kubernetes/jaeger.yaml
 	kubectl delete -f kubernetes/proxy-defaults.yaml || true
@@ -139,9 +140,15 @@ clean-k8s-consul:
 	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)
 	kubectl delete --ignore-not-found serviceaccount consul-tls-init
 
+k8s-split:
+	kubectl apply -f kubernetes/splitter.yaml
+
 k8s-create-expense:
 	curl -X POST 'http://localhost:15001/api/expense' -H 'Content-Type:application/json' -d @example/expense.json
 	curl -X POST 'http://localhost:15001/api/expense' -H 'Content-Type:application/json' -d @example/food.json
+
+k8s-expense-version:
+	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/expense/version
 
 k8s-get-report:
 	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
