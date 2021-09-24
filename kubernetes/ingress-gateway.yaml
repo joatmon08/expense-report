@@ -1,56 +1,25 @@
 ---
 apiVersion: consul.hashicorp.com/v1alpha1
-kind: IngressGateway
+kind: ServiceDefaults
 metadata:
-  name: ingress-gateway
+  name: report-kong-proxy
 spec:
-  listeners:
-    - port: 8080
-      protocol: http
-      services:
-        - name: report
-        - name: expense
+  protocol: http
 ---
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: report
+  annotations:
+    kubernetes.io/ingress.class: kong
 spec:
-  destination:
-    name: report
-  sources:
-    - name: ingress-gateway
-      permissions:
-        - action: allow
-          http:
-            pathPrefix: /api/report/trip
-            methods: ["GET"]
-        - action: allow
-          http:
-            pathExact: /api/report/expense/version
-            methods: ["GET"]
----
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
-metadata:
-  name: expense
-spec:
-  destination:
-    name: expense
-  sources:
-    - name: report
-      permissions:
-        - action: allow
-          http:
-            pathPrefix: /api/expense/trip
-            methods: ["GET"]
-        - action: allow
-          http:
-            pathExact: /api
-            methods: ["GET"]
-    - name: ingress-gateway
-      permissions:
-        - action: allow
-          http:
-            pathPrefix: /api/expense
-            methods: ["POST"]
+  rules:
+    - http:
+        paths:
+          - path: /api/report
+            pathType: Prefix
+            backend:
+              service:
+                name: report
+                port:
+                  number: 5002

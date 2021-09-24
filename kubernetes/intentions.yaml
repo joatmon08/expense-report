@@ -7,16 +7,16 @@ spec:
   destination:
     name: report
   sources:
-    - name: ingress-gateway
+    - name: report-kong-proxy
       permissions:
         - action: allow
           http:
-            pathPrefix: /api/report/trip
-            methods: ["GET"]
+            pathExact: /api/report/expense/version
+            methods: ['GET']
         - action: allow
           http:
-            pathExact: /api/report/expense/version
-            methods: ["GET"]
+            pathPrefix: /api/report/trip
+            methods: ['GET']
 ---
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceIntentions
@@ -36,9 +36,3 @@ spec:
           http:
             pathExact: /api
             methods: ["GET"]
-    - name: ingress-gateway
-      permissions:
-        - action: allow
-          http:
-            pathPrefix: /api/expense
-            methods: ["POST"]

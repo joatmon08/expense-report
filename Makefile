@@ -90,13 +90,14 @@ test-router:
 k8s-consul:
 	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
 
+k8s-ingress:
+	helm upgrade --install report kong/kong -f helm/kong.yaml
+	kubectl apply -f kubernetes/ingress-gateway.yaml
+
 k8s-jaeger:
 	kubectl apply -f kubernetes/proxy-defaults.yaml
 	kubectl apply -f kubernetes/jaeger.yaml
 	kubectl apply -f kubernetes/intentions.yaml
-
-k8s-ingress:
-	kubectl apply -f kubernetes/ingress-gateway.yaml
 
 k8s-java:
 	kubectl apply -f kubernetes/database-mysql.yaml
@@ -132,20 +133,15 @@ clean-k8s-jaeger:
 	kubectl delete -f kubernetes/jaeger.yaml
 	kubectl delete -f kubernetes/proxy-defaults.yaml || true
 
-clean-consul:
+clean-k8s-consul:
 	helm del consul || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l chart=consul-helm -o name)
 	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)
 	kubectl delete --ignore-not-found serviceaccount consul-tls-init
 
-k8s-get-expense:
-	curl -s -H 'Host:expense.ingress.consul' \
-		http://$(shell kubectl get svc consul-ingress-gateway -o jsonpath="{.status.loadBalancer.ingress[*].ip}"):8080/api/expense
-
 k8s-create-expense:
-	curl -s -X POST -H 'Host:expense.ingress.consul' -H 'Content-Type:application/json' -d @example/expense.json \
-		http://$(shell kubectl get svc consul-ingress-gateway -o jsonpath="{.status.loadBalancer.ingress[*].ip}"):8080/api/expense | jq .
+	curl -X POST 'http://localhost:15001/api/expense' -H 'Content-Type:application/json' -d @example/expense.json
+	curl -X POST 'http://localhost:15001/api/expense' -H 'Content-Type:application/json' -d @example/food.json
 
 k8s-get-report:
-	curl -s -H 'Host:report.ingress.consul'  \
-		http://$(shell kubectl get svc consul-ingress-gateway -o jsonpath="{.status.loadBalancer.ingress[*].ip}"):8080/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
+	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
