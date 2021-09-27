@@ -33,7 +33,7 @@ spec:
                   "endpoint": {
                     "address": {
                       "socket_address": {
-                        "address": "jaeger",
+                        "address": "jaeger.default.svc.cluster.local",
                         "port_value": 9411
                       }
                     }

@@ -1,15 +1,4 @@
 ---
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
-metadata:
-  name: expense-to-db
-spec:
-  destination:
-    name: expense-db-mssql
-  sources:
-    - name: expense
-      action: allow
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

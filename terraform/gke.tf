@@ -32,12 +32,12 @@ resource "random_string" "key_ring" {
 }
 
 resource "google_kms_key_ring" "vault" {
-  name     = var.name
+  name     = "${var.name}-${random_string.key_ring.result}"
   location = var.region
 }
 
 resource "google_kms_crypto_key" "vault" {
-  name            = "${var.name}-${random_string.key_ring.result}"
+  name            = var.name
   key_ring        = google_kms_key_ring.vault.id
   rotation_period = "100000s"
 

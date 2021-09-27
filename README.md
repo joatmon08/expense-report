@@ -126,3 +126,11 @@ To try __application configuration storage__, you can go to the Consul
 UI and examine the `configuration` path under "Key/Value". This uses
 a file format to add the `application.properties` required for a Spring
 Boot application.
+
+
+## Kubernetes
+
+### Report Application
+
+- `joatmon08/report:dotnet-v2`: Does not include a field for total reimbursable expenses.
+- `joatmon08/report:dotnet-v3`: Does include a field for total reimbursable expenses.

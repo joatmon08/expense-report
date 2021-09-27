@@ -1,25 +1,14 @@
 ---
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceIntentions
-metadata:
-  name: expense-to-db-mysql
-spec:
-  destination:
-    name: expense-db-mysql
-  sources:
-    - name: expense
-      action: allow
----
 apiVersion: v1
 data:
   application.properties: |-
     spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
-    spring.zipkin.base-url=http://${JAEGER_HOST:localhost}:9411/
+    spring.zipkin.base-url=http://jaeger:9411/
     spring.zipkin.sender.type=web
-    spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/DemoExpenses?queryInterceptors=brave.mysql8.TracingQueryInterceptor&exceptionInterceptors=brave.mysql8.TracingExceptionInterceptor&zipkinServiceName=expense
+    spring.datasource.url=jdbc:mysql://localhost:3306/DemoExpenses?queryInterceptors=brave.mysql8.TracingQueryInterceptor&exceptionInterceptors=brave.mysql8.TracingExceptionInterceptor&zipkinServiceName=expense
     spring.datasource.username=root
     spring.datasource.password=Testing!123
-    server.port=${SERVER_PORT:8080}
+    server.port=5001
 kind: ConfigMap
 metadata:
   name: expense
@@ -59,10 +48,6 @@ spec:
           ports:
             - containerPort: 5001
           env:
-            - name: JAEGER_HOST
-              value: "jaeger"
-            - name: SERVER_PORT
-              value: "5001"
             - name: SPRING_CONFIG_LOCATION
               value: "/tmp/config/application.properties"
           volumeMounts:

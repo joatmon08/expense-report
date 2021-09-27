@@ -1,17 +1,11 @@
 ---
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceDefaults
-metadata:
-  name: report-kong-proxy
-spec:
-  protocol: http
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: report
   annotations:
     kubernetes.io/ingress.class: kong
+    konghq.com/preserve-host: "false"
 spec:
   rules:
     - http:
@@ -23,3 +17,10 @@ spec:
                 name: report
                 port:
                   number: 5002
+          - path: /api/expense
+            pathType: Exact
+            backend:
+              service:
+                name: expense
+                port:
+                  number: 5001

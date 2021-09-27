@@ -95,8 +95,8 @@ k8s-ingress:
 	kubectl apply -f kubernetes/ingress-gateway.yaml
 
 k8s-jaeger:
-	kubectl apply -f kubernetes/proxy-defaults.yaml
 	kubectl apply -f kubernetes/jaeger.yaml
+	kubectl apply -f kubernetes/proxy-defaults.yaml
 	kubectl apply -f kubernetes/intentions.yaml
 
 k8s-java:
@@ -106,6 +106,9 @@ k8s-java:
 
 k8s-report:
 	kubectl apply -f kubernetes/report.yaml
+	kubectl apply -f kubernetes/report-v2.yaml
+	kubectl apply -f kubernetes/router.yaml
+	kubectl apply -f kubernetes/report-v3.yaml
 
 k8s-dotnet:
 	kubectl apply -f kubernetes/database-mssql.yaml
@@ -113,28 +116,34 @@ k8s-dotnet:
 	kubectl apply -f kubernetes/expense-v1.yaml
 
 clean-k8s-java:
-	kubectl delete -f kubernetes/expense-v2.yaml || true
-	kubectl delete -f kubernetes/expense.yaml || true
-	kubectl delete -f kubernetes/database-mysql.yaml
+	kubectl delete --ignore-not-found -f kubernetes/expense-v2.yaml
+	kubectl delete --ignore-not-found -f kubernetes/expense.yaml
+	kubectl delete --ignore-not-found -f kubernetes/database-mysql.yaml
 
 clean-k8s-dotnet:
-	kubectl delete -f kubernetes/expense-v1.yaml || true
-	kubectl delete -f kubernetes/expense.yaml || true
-	kubectl delete -f kubernetes/database-mssql.yaml
+	kubectl delete --ignore-not-found -f kubernetes/expense-v1.yaml
+	kubectl delete --ignore-not-found -f kubernetes/expense.yaml
+	kubectl delete --ignore-not-found -f kubernetes/database-mssql.yaml
 
 clean-k8s-report:
-	kubectl delete -f kubernetes/report.yaml
+	kubectl delete --ignore-not-found -f kubernetes/report-v3.yaml
+	kubectl delete --ignore-not-found -f kubernetes/router.yaml
+	kubectl delete --ignore-not-found -f kubernetes/report-v2.yaml
+	kubectl delete --ignore-not-found -f kubernetes/report.yaml
 
 clean-k8s-ingress:
-	kubectl delete -f kubernetes/ingress-gateway.yaml
+	kubectl delete --ignore-not-found -f kubernetes/ingress-gateway.yaml
+	helm del report || true
+	kubectl delete --ignore-not-found $(shell kubectl get crds -o name | grep kong)
 
 clean-k8s-jaeger:
-	kubectl delete -f kubernetes/splitter.yaml || true
 	kubectl delete -f kubernetes/intentions.yaml || true
-	kubectl delete -f kubernetes/jaeger.yaml
-	kubectl delete -f kubernetes/proxy-defaults.yaml || true
+	kubectl delete -f kubernetes/jaeger.yaml || true
+	kubectl delete -f kubernetes/proxy-defaults.yaml
 
 clean-k8s-consul:
+	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
+	kubectl delete --ignore-not-found -f kubernetes/router.yaml || true
 	helm del consul || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l chart=consul-helm -o name)
 	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)
@@ -143,12 +152,18 @@ clean-k8s-consul:
 k8s-split:
 	kubectl apply -f kubernetes/splitter.yaml
 
+k8s-get-expense:
+	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/expense
+
 k8s-create-expense:
-	curl -X POST 'http://localhost:15001/api/expense' -H 'Content-Type:application/json' -d @example/expense.json
-	curl -X POST 'http://localhost:15001/api/expense' -H 'Content-Type:application/json' -d @example/food.json
+	curl -X POST 'http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/expense' -H 'Content-Type:application/json' -d @example/expense.json
+	curl -X POST 'http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/expense' -H 'Content-Type:application/json' -d @example/food.json
 
 k8s-expense-version:
 	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/expense/version
 
 k8s-get-report:
 	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
+
+k8s-get-report-debug:
+	curl -s -H 'X-Debug:1' http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .

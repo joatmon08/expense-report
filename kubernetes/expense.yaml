@@ -5,6 +5,8 @@ metadata:
   name: expense
   labels:
     app: expense
+  annotations:
+    ingress.kubernetes.io/service-upstream: "true"
 spec:
   selector:
     app: expense

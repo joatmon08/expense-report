@@ -31,8 +31,36 @@ spec:
         - action: allow
           http:
             pathPrefix: /api/expense/trip
-            methods: ["GET"]
+            methods: ['GET']
         - action: allow
           http:
             pathExact: /api
-            methods: ["GET"]
+            methods: ['GET']
+    - name: report-kong-proxy
+      permissions:
+        - action: allow
+          http:
+            pathExact: /api/expense
+            methods: ['POST']
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: expense-to-db
+spec:
+  destination:
+    name: expense-db-mssql
+  sources:
+    - name: expense
+      action: allow
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: expense-to-db-mysql
+spec:
+  destination:
+    name: expense-db-mysql
+  sources:
+    - name: expense
+      action: allow
