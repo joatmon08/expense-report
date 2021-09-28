@@ -22,7 +22,7 @@ resource "google_service_account" "vault" {
 
 resource "google_project_iam_member" "vault" {
   project = var.project
-  role    = "roles/cloudkms.cryptoKeyDecrypter"
+  role    = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member  = "serviceAccount:${google_service_account.vault.email}"
 }
 

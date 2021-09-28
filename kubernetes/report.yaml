@@ -31,7 +31,6 @@ spec:
   upstreamConfig:
     overrides:
       - name: expense
-        connectTimeoutMs: 5000
         limits:
           maxConnections: 3
           maxPendingRequests: 4

@@ -3,7 +3,7 @@ output "project" {
 }
 
 output "region" {
-  value = google_kms_key_ring.vault.name
+  value = var.region
 }
 
 output "key_ring_name" {

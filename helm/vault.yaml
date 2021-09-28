@@ -1,26 +1,38 @@
 global:
   name: vault
 
-ha:
-  enabled: true
-  raft:
-    eanbled: true
-    config: |
-      ui = true
-      listener "tcp" {
-        tls_disable = 1
-        address = "[::]:8200"
-        cluster_address = "[::]:8201"
-      }
-      storage "consul" {
-        path = "vault"
-        address = "HOST_IP:8500"
-      }
-      service_registration "kubernetes" {}
+server:
+  ha:
+    enabled: true
+    raft:
+      enabled: true
+      config: |
+        disable_mlock = true
+        ui = true
 
-      seal "gcpckms" {
-        project     = "vault-helm-dev-246514"
-        region      = "global"
-        key_ring    = "vault-helm-unseal-kr"
-        crypto_key  = "vault-helm-unseal-key"
-      }
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+          retry_join {
+            leader_api_addr = "http://vault-0.vault-internal:8200"
+          }
+        }
+
+        service_registration "kubernetes" {}
+
+        seal "gcpckms" {
+          project     = "hc-586042379ba4475ba1dce263d76"
+          region      = "us-central1"
+          key_ring    = "kubecon-A3OjrOXL"
+          crypto_key  = "kubecon"
+        }
+
+ui:
+  enabled: true
+  serviceType: LoadBalancer
+  loadBalancerSourceRanges: ["96.242.54.120/32"]

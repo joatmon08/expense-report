@@ -90,14 +90,20 @@ test-router:
 k8s-consul:
 	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
 
-k8s-ingress:
-	helm upgrade --install report kong/kong -f helm/kong.yaml
-	kubectl apply -f kubernetes/ingress-gateway.yaml
+k8s-vault:
+	helm upgrade --install vault hashicorp/vault -f helm/vault.yaml
+
+k8s-vault-init:
+	kubectl exec -it vault-0 -- vault operator init || true
 
 k8s-jaeger:
 	kubectl apply -f kubernetes/jaeger.yaml
 	kubectl apply -f kubernetes/proxy-defaults.yaml
 	kubectl apply -f kubernetes/intentions.yaml
+
+k8s-ingress:
+	helm upgrade --install report kong/kong -f helm/kong.yaml
+	kubectl apply -f kubernetes/ingress-gateway.yaml
 
 k8s-java:
 	kubectl apply -f kubernetes/database-mysql.yaml
@@ -151,6 +157,10 @@ clean-k8s-consul:
 	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)
 	kubectl delete --ignore-not-found serviceaccount consul-tls-init
 
+clean-k8s-vault:
+	helm del vault || true
+	kubectl delete --ignore-not-found $(shell kubectl get pvc -l 'app.kubernetes.io/instance=vault' -o name)
+
 k8s-get-expense:
 	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/expense
 
@@ -168,6 +178,10 @@ k8s-get-report-debug:
 	curl -s -H 'X-Debug:1' http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
 
 k8s-circuit-break:
-	kubectl apply -f kubernetes/splitter-v2.yaml
-	kubectl delete deployment expense-db-mysql
+	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
+	kubectl delete --ignore-not-found deployment expense-db-mysql
 	for i in {1..1000}; do curl -s -o /dev/null -w "%{http_code}" http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa; echo ""; sleep 1; done
+
+k8s-circuit-break-recover:
+	kubectl apply -f kubernetes/database-mysql.yaml
+	kubectl apply -f kubernetes/splitter.yaml

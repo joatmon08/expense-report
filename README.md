@@ -84,7 +84,7 @@ You can create the `report` service by running `make report-app`.
 
 To try __circuit breaking__ (outlier detection in Envoy), note that it the
 configuration requires an unsupported Consul escape hatch override. It cannot
-have any service resolver or splitter configuration. To run it, issue 
+have any service resolver or splitter configuration. To run it, issue
 `make circuit-break`. Note that by running this command, it will delete
 existing Consul L7 configuration and redeploy the `report` service.
 
@@ -100,7 +100,7 @@ the number of expense items to print out in the `report` service. Issue
 `make toggle-on` to enable and you will see a number of items listed.
 
 ```shell
-> curl -s http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq                                                                                                        
+> curl -s http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq
 {
   "tripId": "d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa",
   "expenses": [],
@@ -112,7 +112,7 @@ the number of expense items to print out in the `report` service. Issue
  Run `make toggle-off` to disable and remove the number of expense items.
 
 ```shell
- curl -s http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq                                                                                                        
+ curl -s http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq
 {
   "tripId": "d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa",
   "expenses": [],
