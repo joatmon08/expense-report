@@ -2,6 +2,13 @@ global:
   name: vault
 
 server:
+  annotations:
+    consul.hashicorp.com/connect-inject: "true"
+    consul.hashicorp.com/connect-service: "vault"
+    consul.hashicorp.com/connect-service-port: "8200"
+    consul.hashicorp.com/transparent-proxy-exclude-outbound-cidrs: "199.36.153.4/30"
+    consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "8200,8201"
+    consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "8200,8201"
   ha:
     enabled: true
     raft:
@@ -19,7 +26,7 @@ server:
         storage "raft" {
           path = "/vault/data"
           retry_join {
-            leader_api_addr = "http://vault-0.vault-internal:8200"
+            leader_api_addr = "http://vault:8200"
           }
         }
 

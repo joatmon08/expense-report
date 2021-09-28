@@ -94,7 +94,7 @@ k8s-vault:
 	helm upgrade --install vault hashicorp/vault -f helm/vault.yaml
 
 k8s-vault-init:
-	kubectl exec -it vault-0 -- vault operator init || true
+	kubectl exec -it vault-0 -c vault -- vault operator init || true
 
 k8s-jaeger:
 	kubectl apply -f kubernetes/jaeger.yaml
@@ -179,9 +179,12 @@ k8s-get-report-debug:
 
 k8s-circuit-break:
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
+	@sleep 5
+	for i in {1..3}; do curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/expense/version; echo ""; sleep 1; done
 	kubectl delete --ignore-not-found deployment expense-db-mysql
-	for i in {1..1000}; do curl -s -o /dev/null -w "%{http_code}" http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa; echo ""; sleep 1; done
+	for i in {1..1000}; do curl -s -w "%{http_code}" http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa; echo ""; sleep 1; done
 
 k8s-circuit-break-recover:
 	kubectl apply -f kubernetes/database-mysql.yaml
 	kubectl apply -f kubernetes/splitter.yaml
+	for i in {1..1000}; do curl -s -w " %{http_code}" http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa; echo ""; sleep 1; done

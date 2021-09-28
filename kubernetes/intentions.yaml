@@ -64,3 +64,5 @@ spec:
   sources:
     - name: expense
       action: allow
+    - name: vault
+      action: allow
