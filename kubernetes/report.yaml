@@ -21,3 +21,21 @@ kind: ServiceAccount
 metadata:
   name: report
 automountServiceAccountToken: true
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: report
+spec:
+  protocol: http
+  upstreamConfig:
+    overrides:
+      - name: expense
+        connectTimeoutMs: 5000
+        limits:
+          maxConnections: 3
+          maxPendingRequests: 4
+          maxConcurrentRequests: 5
+        passiveHealthCheck:
+          interval: "30s"
+          maxFailures: 10

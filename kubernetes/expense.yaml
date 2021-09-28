@@ -21,3 +21,10 @@ kind: ServiceAccount
 metadata:
   name: expense
 automountServiceAccountToken: true
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: expense
+spec:
+  protocol: http

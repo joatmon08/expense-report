@@ -103,6 +103,7 @@ k8s-java:
 	kubectl apply -f kubernetes/database-mysql.yaml
 	kubectl apply -f kubernetes/expense.yaml
 	kubectl apply -f kubernetes/expense-v2.yaml
+	kubectl apply -f kubernetes/splitter.yaml
 
 k8s-report:
 	kubectl apply -f kubernetes/report.yaml
@@ -116,6 +117,7 @@ k8s-dotnet:
 	kubectl apply -f kubernetes/expense-v1.yaml
 
 clean-k8s-java:
+	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
 	kubectl delete --ignore-not-found -f kubernetes/expense-v2.yaml
 	kubectl delete --ignore-not-found -f kubernetes/expense.yaml
 	kubectl delete --ignore-not-found -f kubernetes/database-mysql.yaml
@@ -149,9 +151,6 @@ clean-k8s-consul:
 	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)
 	kubectl delete --ignore-not-found serviceaccount consul-tls-init
 
-k8s-split:
-	kubectl apply -f kubernetes/splitter.yaml
-
 k8s-get-expense:
 	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/expense
 
@@ -167,3 +166,8 @@ k8s-get-report:
 
 k8s-get-report-debug:
 	curl -s -H 'X-Debug:1' http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
+
+k8s-circuit-break:
+	kubectl apply -f kubernetes/splitter-v2.yaml
+	kubectl delete deployment expense-db-mysql
+	for i in {1..1000}; do curl -s -o /dev/null -w "%{http_code}" http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa; echo ""; sleep 1; done

@@ -17,7 +17,7 @@ metadata:
   name: expense
 spec:
   splits:
-    - weight: 50
+    - weight: 100
       serviceSubset: v1
-    - weight: 50
+    - weight: 0
       serviceSubset: v2
