@@ -6,6 +6,7 @@ server:
     consul.hashicorp.com/connect-inject: "true"
     consul.hashicorp.com/connect-service: "vault"
     consul.hashicorp.com/connect-service-port: "8200"
+    consul.hashicorp.com/connect-service-upstreams: 'expense-db-mysql:3306'
     consul.hashicorp.com/transparent-proxy-exclude-outbound-cidrs: "199.36.153.4/30"
     consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "8200,8201"
     consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "8200,8201"
@@ -35,7 +36,7 @@ server:
         seal "gcpckms" {
           project     = "hc-586042379ba4475ba1dce263d76"
           region      = "us-central1"
-          key_ring    = "kubecon-A3OjrOXL"
+          key_ring    = "kubecon-jratXtar"
           crypto_key  = "kubecon"
         }
 

@@ -8,6 +8,12 @@ variable "cluster_zone" {
   description = "cluster zone from GKE"
 }
 
+variable "namespace" {
+  type        = string
+  description = "namespace for services"
+  default     = "default"
+}
+
 variable "application" {
   type        = string
   description = "application name for secrets"
@@ -35,6 +41,10 @@ variable "db_port" {
   type        = string
   description = "port for database"
   default     = "3306"
+}
+
+locals {
+  db_role = "${var.application}-db"
 }
 
 data "google_client_config" "default" {}

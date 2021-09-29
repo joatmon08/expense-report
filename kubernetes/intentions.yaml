@@ -66,3 +66,14 @@ spec:
       action: allow
     - name: vault
       action: allow
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: vault
+spec:
+  destination:
+    name: vault
+  sources:
+    - name: '*'
+      action: allow

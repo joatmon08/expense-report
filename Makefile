@@ -92,6 +92,7 @@ k8s-consul:
 
 k8s-vault:
 	helm upgrade --install vault hashicorp/vault -f helm/vault.yaml
+	kubectl apply -f kubernetes/vault.yaml
 
 k8s-vault-init:
 	kubectl exec -it vault-0 -c vault -- vault operator init || true
@@ -158,6 +159,7 @@ clean-k8s-consul:
 	kubectl delete --ignore-not-found serviceaccount consul-tls-init
 
 clean-k8s-vault:
+	kubectl delete --ignore-not-found -f kubernetes/vault.yaml
 	helm del vault || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l 'app.kubernetes.io/instance=vault' -o name)
 

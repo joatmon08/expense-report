@@ -9,7 +9,7 @@ resource "vault_mount" "static" {
 // Create a MySQL database password for bootstrap
 
 resource "vault_generic_secret" "database" {
-  path = "${vault_mount.static.path}/database"
+  path = "${vault_mount.static.path}/mysql"
 
   data_json = <<EOT
 {

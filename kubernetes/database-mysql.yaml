@@ -46,7 +46,20 @@ spec:
         prometheus.io/scrape: "true"
         consul.hashicorp.com/connect-inject: "true"
         consul.hashicorp.com/service-meta-framework: mysql
-        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
+        consul.hashicorp.com/transparent-proxy: "false"
+        # consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411,8200"
+        vault.hashicorp.com/log-level: "debug"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "expense-db-mysql"
+        vault.hashicorp.com/agent-inject-secret-mysql: "expense/static/data/mysql"
+        # vault.hashicorp.com/secret-volume-path-mysql: "/etc/mysql/conf.d"
+        # vault.hashicorp.com/agent-inject-file-mysql: "config-file.cnf"
+        vault.hashicorp.com/agent-inject-template-mysql: |
+          [client]
+          {{ with secret "expense/static/data/mysql" -}}
+          user={{ .Data.db_login }}
+          password={{ .Data.db_login_password }}
+          {{- end }}
       labels:
         app: expense-db-mysql
         framework: mysql
