@@ -2,14 +2,6 @@ global:
   name: vault
 
 server:
-  annotations:
-    consul.hashicorp.com/connect-inject: "true"
-    consul.hashicorp.com/connect-service: "vault"
-    consul.hashicorp.com/connect-service-port: "8200"
-    consul.hashicorp.com/connect-service-upstreams: 'expense-db-mysql:3306'
-    consul.hashicorp.com/transparent-proxy-exclude-outbound-cidrs: "199.36.153.4/30"
-    consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "8200,8201"
-    consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "8200,8201"
   ha:
     enabled: true
     raft:
@@ -44,3 +36,6 @@ ui:
   enabled: true
   serviceType: LoadBalancer
   loadBalancerSourceRanges: ["96.242.54.120/32"]
+
+csi:
+  enabled: true

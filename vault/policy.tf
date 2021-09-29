@@ -3,7 +3,7 @@ resource "vault_policy" "db" {
 
   policy = <<EOT
 path "${var.application}/static/data/mysql" {
-  capabilities = ["read","list"]
+  capabilities = ["read"]
 }
 EOT
 }

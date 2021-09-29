@@ -91,11 +91,12 @@ k8s-consul:
 	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
 
 k8s-vault:
+	helm upgrade --install csi secrets-store-csi-driver/secrets-store-csi-driver --namespace kube-system  -f helm/csi.yaml
 	helm upgrade --install vault hashicorp/vault -f helm/vault.yaml
 	kubectl apply -f kubernetes/vault.yaml
 
 k8s-vault-init:
-	kubectl exec -it vault-0 -c vault -- vault operator init || true
+	kubectl exec -it vault-0 -c vault -- vault operator init > secrets.env || true
 
 k8s-jaeger:
 	kubectl apply -f kubernetes/jaeger.yaml
@@ -159,8 +160,10 @@ clean-k8s-consul:
 	kubectl delete --ignore-not-found serviceaccount consul-tls-init
 
 clean-k8s-vault:
+	helm del vault || true
 	kubectl delete --ignore-not-found -f kubernetes/vault.yaml
 	helm del vault || true
+	helm del csi --namespace=kube-system || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l 'app.kubernetes.io/instance=vault' -o name)
 
 k8s-get-expense:
