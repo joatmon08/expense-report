@@ -23,7 +23,7 @@ service {
       port = 20000
 
       check {
-        name     = "Connect Envoy Sidecar"
+        name     = "Connect Sidecar Listening"
         id       = "expense-db-mssql-sidecar-proxy-check"
         tcp      = "10.5.0.6:20000"
         interval = "10s"
@@ -31,8 +31,7 @@ service {
 
       proxy {
         config {
-          protocol                   = "tcp"
-          envoy_prometheus_bind_addr = "0.0.0.0:9102"
+          protocol = "tcp"
         }
       }
     }

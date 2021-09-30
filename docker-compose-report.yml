@@ -10,7 +10,7 @@ services:
     volumes:
       - "./report:/etc/report"
   report_proxy:
-    image: joatmon08/consul-envoy:v1.9.5-v1.16.2
+    image: joatmon08/consul-envoy:v1.10.3-v1.18.4
     restart: always
     environment:
       CONSUL_HTTP_ADDR: 10.5.0.2:8500

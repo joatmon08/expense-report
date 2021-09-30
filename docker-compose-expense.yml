@@ -9,9 +9,9 @@ services:
       vpcbr:
         ipv4_address: 10.5.0.4
     ports:
-      - 8080:8080
+      - 18080:8080
   expense_proxy_java:
-    image: joatmon08/consul-envoy:v1.9.5-v1.16.2
+    image: joatmon08/consul-envoy:v1.10.3-v1.18.4
     restart: always
     environment:
       CONSUL_HTTP_ADDR: 10.5.0.2:8500
@@ -35,9 +35,9 @@ services:
       vpcbr:
         ipv4_address: 10.5.0.7
     ports:
-      - 5001:5001
+      - 15001:5001
   expense_proxy_dotnet:
-    image: joatmon08/consul-envoy:v1.9.5-v1.16.2
+    image: joatmon08/consul-envoy:v1.10.3-v1.18.4
     restart: always
     environment:
       CONSUL_HTTP_ADDR: 10.5.0.2:8500
