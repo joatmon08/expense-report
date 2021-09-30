@@ -75,5 +75,7 @@ spec:
   destination:
     name: vault
   sources:
-    - name: '*'
+    - name: 'expense'
+      action: allow
+    - name: 'expense-db-mysql'
       action: allow

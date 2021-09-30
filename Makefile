@@ -87,7 +87,10 @@ test-router:
 	docker exec -it expense-report_report_1 curl -H 'X-Request-ID:java' localhost:5001/api/expense | jq '.'
 	docker exec -it expense-report_report_1 curl localhost:5001/api/expense | jq '.'
 
-k8s-consul:
+kubeconfig:
+	gcloud container clusters get-credentials kubecon --zone us-central1-c
+
+k8s-consul: kubeconfig
 	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
 
 k8s-vault:
@@ -96,7 +99,9 @@ k8s-vault:
 	kubectl apply -f kubernetes/vault.yaml
 
 k8s-vault-init:
-	kubectl exec -it vault-0 -c vault -- vault operator init > secrets.env || true
+	kubectl exec -it vault-0 -c vault -- vault operator init -format=json > vault-root.json || true
+	sleep 30
+	source variables.env && cd vault && terraform init && terraform apply
 
 k8s-jaeger:
 	kubectl apply -f kubernetes/jaeger.yaml
@@ -110,6 +115,7 @@ k8s-ingress:
 k8s-java:
 	kubectl apply -f kubernetes/database-mysql.yaml
 	kubectl apply -f kubernetes/expense.yaml
+	source variables.env && cd vault && terraform init && terraform apply
 	kubectl apply -f kubernetes/expense-v2.yaml
 	kubectl apply -f kubernetes/splitter.yaml
 
@@ -160,11 +166,13 @@ clean-k8s-consul:
 	kubectl delete --ignore-not-found serviceaccount consul-tls-init
 
 clean-k8s-vault:
+	source variables.env && cd vault && terraform destroy -auto-approve || true
 	helm del vault || true
 	kubectl delete --ignore-not-found -f kubernetes/vault.yaml
 	helm del vault || true
 	helm del csi --namespace=kube-system || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l 'app.kubernetes.io/instance=vault' -o name)
+	rm -f secrets.env
 
 k8s-get-expense:
 	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/expense
@@ -193,3 +201,6 @@ k8s-circuit-break-recover:
 	kubectl apply -f kubernetes/database-mysql.yaml
 	kubectl apply -f kubernetes/splitter.yaml
 	for i in {1..1000}; do curl -s -w " %{http_code}" http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa; echo ""; sleep 1; done
+
+k8s-vault-leases:
+	vault list sys/leases/lookup/expense/database/creds/expense

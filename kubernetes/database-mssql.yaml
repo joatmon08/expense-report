@@ -54,7 +54,7 @@ spec:
       serviceAccountName: expense-db-mssql
       containers:
         - name: expense-db-mssql
-          image: "joatmon08/expense-db:mssql"
+          image: "joatmon08/expense-db:mssql-2019"
           ports:
             - containerPort: 1433
           env:

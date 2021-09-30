@@ -26,3 +26,6 @@ circuit_breaking/report.hcl
 bin/
 obj/
 report/toggles
+
+# Vault
+vault-root.json

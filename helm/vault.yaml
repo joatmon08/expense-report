@@ -2,6 +2,12 @@ global:
   name: vault
 
 server:
+  annotations:
+    consul.hashicorp.com/connect-inject: 'true'
+    consul.hashicorp.com/connect-service: 'vault'
+    consul.hashicorp.com/connect-service-port: '8200'
+    consul.hashicorp.com/connect-service-upstreams: 'expense-db-mysql:3306'
+    consul.hashicorp.com/transparent-proxy: 'false'
   ha:
     enabled: true
     raft:
@@ -26,9 +32,9 @@ server:
         service_registration "kubernetes" {}
 
         seal "gcpckms" {
-          project     = "hc-586042379ba4475ba1dce263d76"
+          project     = "hc-93038b1ee86644cab765bc9a7b0"
           region      = "us-central1"
-          key_ring    = "kubecon-jratXtar"
+          key_ring    = "kubecon-8dKOPyHq"
           crypto_key  = "kubecon"
         }
 

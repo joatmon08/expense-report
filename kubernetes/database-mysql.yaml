@@ -74,7 +74,7 @@ spec:
       serviceAccountName: expense-db-mysql
       containers:
         - name: expense-db-mysql
-          image: "joatmon08/expense-db:mysql"
+          image: "joatmon08/expense-db:mysql-8"
           ports:
             - containerPort: 3306
           env:

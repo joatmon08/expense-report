@@ -13,11 +13,7 @@ resource "vault_policy" "application" {
   name = var.application
 
   policy = <<EOT
-path "${var.application}/static/mysql/*" {
-  capabilities = ["read"]
-}
-
-path "${vault_mount.db.path}/*" {
+path "${vault_mount.db.path}/creds/expense" {
   capabilities = ["read"]
 }
 EOT
