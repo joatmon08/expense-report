@@ -1,24 +1,4 @@
 ---
-apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
-kind: SecretProviderClass
-metadata:
-  name: vault-db-mysql
-spec:
-  provider: vault
-  secretObjects:
-    - secretName: vault-db-mysql
-      type: Opaque
-      data:
-        - objectName: dbPassword
-          key: password
-  parameters:
-    roleName: 'expense-db-mysql'
-    vaultAddress: 'http://vault.default:8200'
-    objects: |
-      - objectName: "dbPassword"
-        secretPath: "expense/static/data/mysql"
-        secretKey: "db_login_password"
----
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceDefaults
 metadata:
@@ -66,7 +46,15 @@ spec:
         prometheus.io/scrape: "true"
         consul.hashicorp.com/connect-inject: "true"
         consul.hashicorp.com/service-meta-framework: mysql
-        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411,8200"
+        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/role: "expense-db-mysql"
+        vault.hashicorp.com/agent-inject-secret-db: "expense/static/data/mysql"
+        vault.hashicorp.com/agent-inject-template-db: |
+          {{ with secret "expense/static/data/mysql" -}}
+          export MYSQL_ROOT_PASSWORD="{{ .Data.data.db_login_password }}"
+          {{- end }}
       labels:
         app: expense-db-mysql
         framework: mysql
@@ -77,25 +65,10 @@ spec:
           image: "joatmon08/expense-db:mysql-8"
           ports:
             - containerPort: 3306
-          env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: vault-db-mysql
-                  key: password
-          volumeMounts:
-            - name: 'vault-db-mysql'
-              mountPath: '/mnt/secrets-store'
-              readOnly: true
+          command: ["/bin/bash"]
+          args: ["-c", "source /vault/secrets/db && /usr/local/bin/docker-entrypoint.sh mysqld"]
           livenessProbe:
             tcpSocket:
               port: 3306
             initialDelaySeconds: 30
             periodSeconds: 60
-      volumes:
-        - name: vault-db-mysql
-          csi:
-            driver: 'secrets-store.csi.k8s.io'
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: 'vault-db-mysql'

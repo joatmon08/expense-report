@@ -1,24 +1,4 @@
 ---
-apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
-kind: SecretProviderClass
-metadata:
-  name: vault-db-mssql
-spec:
-  provider: vault
-  secretObjects:
-    - secretName: vault-db-mssql
-      type: Opaque
-      data:
-        - objectName: dbPassword
-          key: password
-  parameters:
-    roleName: 'expense-db-mssql'
-    vaultAddress: 'http://vault.default:8200'
-    objects: |
-      - objectName: "dbPassword"
-        secretPath: "expense/static/data/mssql"
-        secretKey: "db_login_password"
----
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceDefaults
 metadata:
@@ -66,7 +46,15 @@ spec:
         prometheus.io/scrape: "true"
         consul.hashicorp.com/connect-inject: "true"
         consul.hashicorp.com/service-meta-framework: mssql
-        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411,8200"
+        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/role: "expense-db-mssql"
+        vault.hashicorp.com/agent-inject-secret-db: "expense/static/data/mssql"
+        vault.hashicorp.com/agent-inject-template-db: |
+          {{ with secret "expense/static/data/mssql" -}}
+          export SA_PASSWORD="{{ .Data.data.db_login_password }}"
+          {{- end }}
       labels:
         app: expense-db-mssql
         framework: mssql
@@ -80,24 +68,10 @@ spec:
           env:
             - name: ACCEPT_EULA
               value: "y"
-            - name: SA_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: vault-db-mssql
-                  key: password
-          volumeMounts:
-            - name: 'vault-db-mssql'
-              mountPath: '/mnt/secrets-store'
-              readOnly: true
+          command: ["/bin/bash"]
+          args: ["-c", "source /vault/secrets/db && bash /usr/src/app/entrypoint.sh"]
           livenessProbe:
             tcpSocket:
               port: 1433
             initialDelaySeconds: 30
             periodSeconds: 60
-      volumes:
-        - name: vault-db-mssql
-          csi:
-            driver: 'secrets-store.csi.k8s.io'
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: 'vault-db-mssql'

@@ -116,6 +116,7 @@ k8s-ingress:
 
 k8s-database:
 	kubectl apply -f kubernetes/database-mysql.yaml
+	kubectl rollout status deployment expense-db-mysql
 	kubectl apply -f kubernetes/database-mssql.yaml
 	kubectl rollout status deployment expense-db-mssql
 	source variables.env && cd vault && terraform init && terraform apply
@@ -145,6 +146,8 @@ clean-k8s-java:
 clean-k8s-dotnet:
 	kubectl delete --ignore-not-found -f kubernetes/expense-v1.yaml
 	kubectl delete --ignore-not-found -f kubernetes/expense.yaml
+
+clean-k8s-expense: clean-k8s-dotnet clean-k8s-java
 
 clean-k8s-database:
 	kubectl delete --ignore-not-found -f kubernetes/database-mssql.yaml

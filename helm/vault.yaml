@@ -7,7 +7,9 @@ server:
     consul.hashicorp.com/connect-service: 'vault'
     consul.hashicorp.com/connect-service-port: '8200'
     consul.hashicorp.com/connect-service-upstreams: 'expense-db-mysql:3306,expense-db-mssql:1433'
-    consul.hashicorp.com/transparent-proxy: 'false'
+    consul.hashicorp.com/transparent-proxy-exclude-outbound-cidrs: "199.36.153.4/30"
+    consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "8200,8201"
+    consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "8200,8201"
   ha:
     enabled: true
     raft:
@@ -44,4 +46,4 @@ ui:
   loadBalancerSourceRanges: ["96.242.54.120/32"]
 
 csi:
-  enabled: true
+  enabled: false
