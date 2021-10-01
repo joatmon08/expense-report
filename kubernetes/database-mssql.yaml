@@ -1,4 +1,24 @@
 ---
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: vault-db-mssql
+spec:
+  provider: vault
+  secretObjects:
+    - secretName: vault-db-mssql
+      type: Opaque
+      data:
+        - objectName: dbPassword
+          key: password
+  parameters:
+    roleName: 'expense-db-mssql'
+    vaultAddress: 'http://vault.default:8200'
+    objects: |
+      - objectName: "dbPassword"
+        secretPath: "expense/static/data/mssql"
+        secretKey: "db_login_password"
+---
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceDefaults
 metadata:
@@ -46,7 +66,7 @@ spec:
         prometheus.io/scrape: "true"
         consul.hashicorp.com/connect-inject: "true"
         consul.hashicorp.com/service-meta-framework: mssql
-        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
+        consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411,8200"
       labels:
         app: expense-db-mssql
         framework: mssql
@@ -61,9 +81,23 @@ spec:
             - name: ACCEPT_EULA
               value: "y"
             - name: SA_PASSWORD
-              value: "Testing!123"
+              valueFrom:
+                secretKeyRef:
+                  name: vault-db-mssql
+                  key: password
+          volumeMounts:
+            - name: 'vault-db-mssql'
+              mountPath: '/mnt/secrets-store'
+              readOnly: true
           livenessProbe:
             tcpSocket:
               port: 1433
             initialDelaySeconds: 30
             periodSeconds: 60
+      volumes:
+        - name: vault-db-mssql
+          csi:
+            driver: 'secrets-store.csi.k8s.io'
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: 'vault-db-mssql'

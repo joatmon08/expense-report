@@ -53,6 +53,8 @@ spec:
   sources:
     - name: expense
       action: allow
+    - name: vault
+      action: allow
 ---
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceIntentions
@@ -78,4 +80,6 @@ spec:
     - name: 'expense'
       action: allow
     - name: 'expense-db-mysql'
+      action: allow
+    - name: 'expense-db-mssql'
       action: allow

@@ -6,7 +6,7 @@ server:
     consul.hashicorp.com/connect-inject: 'true'
     consul.hashicorp.com/connect-service: 'vault'
     consul.hashicorp.com/connect-service-port: '8200'
-    consul.hashicorp.com/connect-service-upstreams: 'expense-db-mysql:3306'
+    consul.hashicorp.com/connect-service-upstreams: 'expense-db-mysql:3306,expense-db-mssql:1433'
     consul.hashicorp.com/transparent-proxy: 'false'
   ha:
     enabled: true
@@ -34,7 +34,7 @@ server:
         seal "gcpckms" {
           project     = "hc-93038b1ee86644cab765bc9a7b0"
           region      = "us-central1"
-          key_ring    = "kubecon-8dKOPyHq"
+          key_ring    = "kubecon-a9yGfySh"
           crypto_key  = "kubecon"
         }
 

@@ -19,32 +19,51 @@ variable "application" {
   description = "application name for secrets"
 }
 
-variable "db_username" {
+variable "mysql_username" {
   type        = string
-  description = "bootstrap username for database"
+  description = "admin username for mysql database"
   default     = "root"
   sensitive   = true
 }
 
-variable "db_password" {
+variable "mysql_password" {
   type        = string
-  description = "bootstrap password for database"
+  description = "admin password for mysql database"
   sensitive   = true
 }
 
-variable "db_service" {
+variable "mysql_service" {
   type        = string
-  description = "endpoint for database"
+  description = "endpoint for mysql database"
 }
 
-variable "db_port" {
+variable "mysql_port" {
   type        = string
-  description = "port for database"
+  description = "port for mysql database"
   default     = "3306"
 }
 
-locals {
-  db_role = "${var.application}-db"
+variable "mssql_username" {
+  type        = string
+  description = "admin username for mssql database"
+  default     = "SA"
+  sensitive   = true
+}
+
+variable "mssql_password" {
+  type        = string
+  description = "admin password for mssql database"
+}
+
+variable "mssql_service" {
+  type        = string
+  description = "endpoint for mssql database"
+}
+
+variable "mssql_port" {
+  type        = string
+  description = "port for mysql database"
+  default     = "1433"
 }
 
 data "google_client_config" "default" {}

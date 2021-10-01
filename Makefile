@@ -100,7 +100,9 @@ k8s-vault:
 
 k8s-vault-init:
 	kubectl exec -it vault-0 -c vault -- vault operator init -format=json > vault-root.json || true
-	sleep 30
+	kubectl wait --for=condition=ready pod vault-0
+	kubectl wait --for=condition=ready pod vault-1
+	kubectl wait --for=condition=ready pod vault-2
 	source variables.env && cd vault && terraform init && terraform apply
 
 k8s-jaeger:
@@ -112,12 +114,22 @@ k8s-ingress:
 	helm upgrade --install report kong/kong -f helm/kong.yaml
 	kubectl apply -f kubernetes/ingress-gateway.yaml
 
-k8s-java:
+k8s-database:
 	kubectl apply -f kubernetes/database-mysql.yaml
-	kubectl apply -f kubernetes/expense.yaml
+	kubectl apply -f kubernetes/database-mssql.yaml
+	kubectl rollout status deployment expense-db-mssql
 	source variables.env && cd vault && terraform init && terraform apply
+
+k8s-java:
+	kubectl apply -f kubernetes/expense.yaml
 	kubectl apply -f kubernetes/expense-v2.yaml
 	kubectl apply -f kubernetes/splitter.yaml
+
+k8s-dotnet:
+	kubectl apply -f kubernetes/expense.yaml
+	kubectl apply -f kubernetes/expense-v1.yaml
+
+k8s-expense: k8s-dotnet k8s-java
 
 k8s-report:
 	kubectl apply -f kubernetes/report.yaml
@@ -125,21 +137,18 @@ k8s-report:
 	kubectl apply -f kubernetes/router.yaml
 	kubectl apply -f kubernetes/report-v3.yaml
 
-k8s-dotnet:
-	kubectl apply -f kubernetes/database-mssql.yaml
-	kubectl apply -f kubernetes/expense.yaml
-	kubectl apply -f kubernetes/expense-v1.yaml
-
 clean-k8s-java:
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
 	kubectl delete --ignore-not-found -f kubernetes/expense-v2.yaml
 	kubectl delete --ignore-not-found -f kubernetes/expense.yaml
-	kubectl delete --ignore-not-found -f kubernetes/database-mysql.yaml
 
 clean-k8s-dotnet:
 	kubectl delete --ignore-not-found -f kubernetes/expense-v1.yaml
 	kubectl delete --ignore-not-found -f kubernetes/expense.yaml
+
+clean-k8s-database:
 	kubectl delete --ignore-not-found -f kubernetes/database-mssql.yaml
+	kubectl delete --ignore-not-found -f kubernetes/database-mysql.yaml
 
 clean-k8s-report:
 	kubectl delete --ignore-not-found -f kubernetes/report-v3.yaml
@@ -203,4 +212,9 @@ k8s-circuit-break-recover:
 	for i in {1..1000}; do curl -s -w " %{http_code}" http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa; echo ""; sleep 1; done
 
 k8s-vault-leases:
-	vault list sys/leases/lookup/expense/database/creds/expense
+	vault list sys/leases/lookup/expense/database/mysql/creds/expense || true
+	vault list sys/leases/lookup/expense/database/mssql/creds/expense
+
+k8s-vault-leases-revoke:
+	vault lease revoke -prefix expense/database/mysql/creds
+	vault lease revoke -prefix expense/database/mssql/creds
