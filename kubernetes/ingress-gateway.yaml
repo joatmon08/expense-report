@@ -24,3 +24,31 @@ spec:
                 name: expense
                 port:
                   number: 5001
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongClusterPlugin
+metadata:
+  name: tracing
+  annotations:
+    kubernetes.io/ingress.class: kong
+  labels:
+    global: "true"
+config:
+  http_endpoint: http://jaeger:9411/api/v2/spans
+  sample_ratio: 0.001
+  include_credential: true
+  traceid_byte_count: 16
+  header_type: b3
+  default_header_type: b3
+  tags_header: Zipkin-Tags
+plugin: zipkin
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongClusterPlugin
+metadata:
+  name: prometheus
+  annotations:
+    kubernetes.io/ingress.class: kong
+  labels:
+    global: "true"
+plugin: prometheus

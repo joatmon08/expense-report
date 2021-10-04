@@ -36,7 +36,7 @@ server:
         seal "gcpckms" {
           project     = "hc-93038b1ee86644cab765bc9a7b0"
           region      = "us-central1"
-          key_ring    = "kubecon-a9yGfySh"
+          key_ring    = "kubecon-omcRMlgm"
           crypto_key  = "kubecon"
         }
 

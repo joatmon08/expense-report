@@ -92,6 +92,7 @@ kubeconfig:
 
 k8s-consul: kubeconfig
 	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
+	helm upgrade --install grafana grafana/grafana -f helm/grafana.yaml
 
 k8s-vault:
 	helm upgrade --install csi secrets-store-csi-driver/secrets-store-csi-driver --namespace kube-system  -f helm/csi.yaml
@@ -112,6 +113,7 @@ k8s-jaeger:
 
 k8s-ingress:
 	helm upgrade --install report kong/kong -f helm/kong.yaml
+	kubectl rollout status deployment report-kong
 	kubectl apply -f kubernetes/ingress-gateway.yaml
 
 k8s-database:
@@ -170,8 +172,9 @@ clean-k8s-jaeger:
 	kubectl delete -f kubernetes/proxy-defaults.yaml
 
 clean-k8s-consul:
+	helm del grafana || true
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
-	kubectl delete --ignore-not-found -f kubernetes/router.yaml || true
+	kubectl delete --ignore-not-found -f kubernetes/router.yaml
 	helm del consul || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l chart=consul-helm -o name)
 	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)
@@ -219,5 +222,5 @@ k8s-vault-leases:
 	vault list sys/leases/lookup/expense/database/mssql/creds/expense
 
 k8s-vault-leases-revoke:
-	vault lease revoke -prefix expense/database/mysql/creds
-	vault lease revoke -prefix expense/database/mssql/creds
+	source variables.env && vault lease revoke -prefix expense/database/mysql/creds
+	source variables.env && vault lease revoke -prefix expense/database/mssql/creds
