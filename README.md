@@ -3,8 +3,6 @@
 A set of .NET Core and Java Spring Boot services that records expenses
 and returns a report for a given trip identifier.
 
-![How Expense Report Works](./image/diagram.png)
-
 ## What it does
 
 Expense Report uses Consul for service mesh, application configuration,
@@ -47,12 +45,16 @@ Below are the most useful endpoints for the `report` service:
 created in the `POST` method to `expense`. Since the `report` application is
 currently only available in .NET Core, it runs by default on port `:5002`.
 
-## Prerequisites
+## Docker-Compose
+
+![How Expense Report Works](./image/diagram.png)
+
+### Prerequisites
 
 * Docker
 * docker-compose
 
-## Startup
+### Startup
 
 1. To start, bring up the Consul server, MySQL database, Microsoft SQL
    Server database, `consul-template`, Jaeger for tracing, and
@@ -61,7 +63,7 @@ currently only available in .NET Core, it runs by default on port `:5002`.
    ```shell
    > make all
    ```
-  
+
    This will not only bring up the stack but add the application configuration
    for the `expense` service.
 
@@ -129,6 +131,16 @@ Boot application.
 
 
 ## Kubernetes
+
+The configurations use a cluster set up in GKE as per the `/terraform` directory.
+You can use the Terraform to create a Kubernetes cluster for all of the applications.
+
+![How Expense Report Works](./image/kubernetes.png)
+
+### Expense Application
+
+- `joatmon08/expense:dotnet`: Uses Microsoft SQL Server with a .NET Core 2.2 application.
+- `joatmon08/expense:java-v2`: Uses MySQL with a Sprint Boot application.
 
 ### Report Application
 
