@@ -214,15 +214,13 @@ k8s-get-report-debug:
 
 k8s-circuit-break:
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
-	@sleep 5
-	for i in {1..3}; do curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/expense/version; echo ""; sleep 1; done
 	kubectl delete --ignore-not-found deployment expense-db-mysql
-	for i in {1..1000}; do curl -s -w "%{http_code}" http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa; echo ""; sleep 1; done
+	locust --autostart -f locust/locustfile.py --users 30 --spawn-rate 5 -t 15m \
+		-H http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")
 
 k8s-circuit-break-recover:
 	kubectl apply -f kubernetes/database-mysql.yaml
 	kubectl apply -f kubernetes/splitter.yaml
-	for i in {1..1000}; do curl -s -w " %{http_code}" http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa; echo ""; sleep 1; done
 
 k8s-vault-leases:
 	vault list sys/leases/lookup/expense/database/mysql/creds/expense || true

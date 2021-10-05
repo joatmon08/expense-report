@@ -31,10 +31,6 @@ spec:
   upstreamConfig:
     overrides:
       - name: expense
-        limits:
-          maxConnections: 3
-          maxPendingRequests: 4
-          maxConcurrentRequests: 5
         passiveHealthCheck:
-          interval: "30s"
-          maxFailures: 10
+          interval: "10s"
+          maxFailures: 3
