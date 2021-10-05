@@ -33,3 +33,5 @@ dashboards:
       gnetId: 7424
       revision: 5
       datasource: Prometheus
+    app-dash:
+      url: https://raw.githubusercontent.com/joatmon08/expense-report/main/grafana/app.json

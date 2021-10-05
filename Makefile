@@ -92,6 +92,8 @@ kubeconfig:
 
 k8s-consul: kubeconfig
 	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
+
+k8s-grafana:
 	helm upgrade --install grafana grafana/grafana -f helm/grafana.yaml
 
 k8s-vault:
@@ -172,13 +174,15 @@ clean-k8s-jaeger:
 	kubectl delete -f kubernetes/proxy-defaults.yaml
 
 clean-k8s-consul:
-	helm del grafana || true
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
 	kubectl delete --ignore-not-found -f kubernetes/router.yaml
 	helm del consul || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l chart=consul-helm -o name)
 	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)
 	kubectl delete --ignore-not-found serviceaccount consul-tls-init
+
+clean-k8s-grafana:
+	helm del grafana
 
 clean-k8s-vault:
 	source variables.env && cd vault && terraform destroy -auto-approve || true
@@ -188,6 +192,9 @@ clean-k8s-vault:
 	helm del csi --namespace=kube-system || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l 'app.kubernetes.io/instance=vault' -o name)
 	rm -f secrets.env
+
+clean-k8s:
+	cd terraform && terraform destroy -auto-approve
 
 k8s-get-expense:
 	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/expense
