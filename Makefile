@@ -126,13 +126,11 @@ k8s-database:
 	source variables.env && cd vault && terraform init && terraform apply
 
 k8s-java:
-	kubectl apply -f kubernetes/expense.yaml
 	kubectl apply -f kubernetes/expense-v2.yaml
 	kubectl apply -f kubernetes/splitter.yaml
 
 k8s-dotnet:
 	kubectl apply -f kubernetes/expense.yaml
-	kubectl apply -f kubernetes/expense-v1.yaml
 
 k8s-expense: k8s-dotnet k8s-java
 
@@ -145,10 +143,9 @@ k8s-report:
 clean-k8s-java:
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
 	kubectl delete --ignore-not-found -f kubernetes/expense-v2.yaml
-	kubectl delete --ignore-not-found -f kubernetes/expense.yaml
 
 clean-k8s-dotnet:
-	kubectl delete --ignore-not-found -f kubernetes/expense-v1.yaml
+	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
 	kubectl delete --ignore-not-found -f kubernetes/expense.yaml
 
 clean-k8s-expense: clean-k8s-dotnet clean-k8s-java
@@ -193,8 +190,7 @@ clean-k8s-vault:
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l 'app.kubernetes.io/instance=vault' -o name)
 	rm -f secrets.env
 
-clean-k8s:
-	cd terraform && terraform destroy -auto-approve
+clean-k8s: clean-k8s-ingress clean-k8s-report clean-k8s-expense k8s-vault-leases-revoke clean-k8s-database clean-k8s-jaeger clean-k8s-grafana clean-k8s-vault clean-k8s-consul
 
 k8s-get-expense:
 	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/expense
@@ -213,14 +209,13 @@ k8s-get-report-debug:
 	curl -s -H 'X-Debug:1' http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
 
 k8s-circuit-break:
-	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
 	kubectl delete --ignore-not-found deployment expense-db-mysql
-	locust --autostart -f locust/locustfile.py --users 30 --spawn-rate 5 -t 15m \
+	locust --autostart --autoquit -f locust/locustfile.py --users 30 --spawn-rate 5 -t 15m \
 		-H http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")
 
-k8s-circuit-break-recover:
-	kubectl apply -f kubernetes/database-mysql.yaml
-	kubectl apply -f kubernetes/splitter.yaml
+k8s-circuit-break-recover: k8s-database
+	kubectl delete pods -l app=expense
+	kubectl delete pods -l 'app.kubernetes.io/name=kong'
 
 k8s-vault-leases:
 	vault list sys/leases/lookup/expense/database/mysql/creds/expense || true

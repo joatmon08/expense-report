@@ -16,7 +16,12 @@ variable "namespace" {
 
 variable "application" {
   type        = string
-  description = "application name for secrets"
+  description = "application prefix for secrets"
+}
+
+variable "application_v2" {
+  type        = string
+  description = "application (v2) name for secrets"
 }
 
 variable "mysql_username" {

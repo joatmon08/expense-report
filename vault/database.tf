@@ -8,7 +8,7 @@ resource "vault_mount" "mysql" {
 resource "vault_database_secret_backend_connection" "mysql" {
   backend       = vault_mount.mysql.path
   name          = "mysql"
-  allowed_roles = [var.application]
+  allowed_roles = [var.application_v2]
   mysql {
     connection_url = "${var.mysql_username}:${var.mysql_password}@tcp(localhost:${var.mysql_port})/"
   }
@@ -16,7 +16,7 @@ resource "vault_database_secret_backend_connection" "mysql" {
 
 resource "vault_database_secret_backend_role" "mysql" {
   backend             = vault_mount.mysql.path
-  name                = var.application
+  name                = var.application_v2
   db_name             = vault_database_secret_backend_connection.mysql.name
   creation_statements = ["CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT ALL PRIVILEGES ON DemoExpenses.expense_item TO '{{name}}'@'%';"]
 }

@@ -1,4 +1,21 @@
 ---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: report-kong-proxy
+spec:
+  protocol: http
+  upstreamConfig:
+    overrides:
+      - name: report
+        passiveHealthCheck:
+          interval: "30s"
+          maxFailures: 10
+      - name: expense
+        passiveHealthCheck:
+          interval: "10s"
+          maxFailures: 3
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

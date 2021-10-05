@@ -1,4 +1,36 @@
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expense-v2
+  labels:
+    app: expense
+    release: v2
+  annotations:
+    ingress.kubernetes.io/service-upstream: "true"
+spec:
+  selector:
+    app: expense
+    release: v2
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5001
+      targetPort: 5001
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: expense-v2
+automountServiceAccountToken: true
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: expense-v2
+spec:
+  protocol: http
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,14 +49,13 @@ spec:
       annotations:
         prometheus.io/scrape: "true"
         consul.hashicorp.com/connect-inject: "true"
-        consul.hashicorp.com/connect-service: "expense"
         consul.hashicorp.com/connect-service-upstreams: "expense-db-mysql:3306"
         consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
         consul.hashicorp.com/service-meta-version: v2
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-init-first: "true"
-        vault.hashicorp.com/role: "expense"
-        vault.hashicorp.com/agent-inject-secret-application.properties: "expense/database/mysql/creds/expense"
+        vault.hashicorp.com/role: "expense-v2"
+        vault.hashicorp.com/agent-inject-secret-application.properties: "expense/database/mysql/creds/expense-v2"
         vault.hashicorp.com/secret-volume-path-application.properties: "/tmp/config"
         vault.hashicorp.com/agent-inject-template-application.properties: |
           spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
@@ -32,7 +63,7 @@ spec:
           spring.zipkin.sender.type=web
           spring.datasource.url=jdbc:mysql://localhost:3306/DemoExpenses?queryInterceptors=brave.mysql8.TracingQueryInterceptor&exceptionInterceptors=brave.mysql8.TracingExceptionInterceptor&zipkinServiceName=expense
           server.port=5001
-          {{ with secret "expense/database/mysql/creds/expense" -}}
+          {{ with secret "expense/database/mysql/creds/expense-v2" -}}
           spring.datasource.username={{ .Data.username }}
           spring.datasource.password={{ .Data.password }}
           {{- end }}
@@ -41,7 +72,7 @@ spec:
         release: v2
         framework: java
     spec:
-      serviceAccountName: expense
+      serviceAccountName: expense-v2
       containers:
         - name: expense
           image: "joatmon08/expense:java-v2"

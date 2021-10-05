@@ -46,6 +46,31 @@ spec:
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceIntentions
 metadata:
+  name: expense-v2
+spec:
+  destination:
+    name: expense-v2
+  sources:
+    - name: report
+      permissions:
+        - action: allow
+          http:
+            pathPrefix: /api/expense/trip
+            methods: ['GET']
+        - action: allow
+          http:
+            pathExact: /api
+            methods: ['GET']
+    - name: report-kong-proxy
+      permissions:
+        - action: allow
+          http:
+            pathExact: /api/expense
+            methods: ['POST']
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
   name: expense-to-db
 spec:
   destination:
@@ -64,7 +89,7 @@ spec:
   destination:
     name: expense-db-mysql
   sources:
-    - name: expense
+    - name: expense-v2
       action: allow
     - name: vault
       action: allow
@@ -77,9 +102,11 @@ spec:
   destination:
     name: vault
   sources:
-    - name: 'expense'
+    - name: expense
       action: allow
-    - name: 'expense-db-mysql'
+    - name: expense-v2
       action: allow
-    - name: 'expense-db-mssql'
+    - name: expense-db-mysql
+      action: allow
+    - name: expense-db-mssql
       action: allow
