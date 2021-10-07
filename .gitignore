@@ -31,3 +31,5 @@ report/toggles
 vault-root.json
 
 __pycache__
+
+!variables.env

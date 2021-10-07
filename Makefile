@@ -90,29 +90,23 @@ test-router:
 kubeconfig:
 	gcloud container clusters get-credentials kubecon --zone us-central1-c
 
+k8s: k8s-consul k8s-grafana k8s-jaeger k8s-ingress k8s-vault k8s-vault-init k8s-database k8s-expense k8s-report
+
 k8s-consul: kubeconfig
 	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
 	kubectl apply -f kubernetes/intentions.yaml
 	kubectl apply -f kubernetes/proxy-defaults.yaml
 
 k8s-grafana:
-	helm upgrade --install grafana grafana/grafana -f helm/grafana.yaml
-
-k8s-vault:
-	cd terraform && terraform output -raw vault_helm > ../helm/vault.yaml
-	helm upgrade --install vault hashicorp/vault -f helm/vault.yaml
-	kubectl apply -f kubernetes/vault.yaml
-
-k8s-vault-init:
-	kubectl exec -it vault-0 -c vault -- vault operator init -format=json > vault-root.json || true
-	kubectl wait --for=condition=ready pod vault-0
-	kubectl delete --ignore-not-found pods vault-1 vault-2
-	kubectl wait --for=condition=ready pod vault-1
-	kubectl wait --for=condition=ready pod vault-2
-	source variables.env && cd vault && terraform init && terraform apply
+	helm upgrade --install grafana grafana/grafana -f helm/grafana.yaml || true
 
 k8s-jaeger:
 	kubectl apply -f kubernetes/jaeger.yaml
+
+k8s-ingress:
+	helm upgrade --install report kong/kong -f helm/kong.yaml
+	kubectl rollout status deployment report-kong
+	kubectl apply -f kubernetes/ingress-gateway.yaml
 
 k8s-database:
 	kubectl apply -f kubernetes/database-mysql.yaml
@@ -121,10 +115,19 @@ k8s-database:
 	kubectl rollout status deployment expense-db-mssql
 	source variables.env && cd vault && terraform init && terraform apply
 
-k8s-ingress:
-	helm upgrade --install report kong/kong -f helm/kong.yaml
-	kubectl rollout status deployment report-kong
-	kubectl apply -f kubernetes/ingress-gateway.yaml
+k8s-vault:
+	cd terraform && terraform output -raw vault_helm > ../helm/vault.yaml
+	helm upgrade --install vault hashicorp/vault -f helm/vault.yaml
+	kubectl apply -f kubernetes/vault.yaml
+
+k8s-vault-init:
+	kubectl wait --for=condition=initialized pod vault-0
+	kubectl exec -it vault-0 -c vault -- vault operator init -format=json > vault-root.json || true
+	kubectl wait --for=condition=ready pod vault-0
+	kubectl delete --ignore-not-found pods vault-1 vault-2
+	kubectl wait --for=condition=ready pod vault-1
+	kubectl wait --for=condition=ready pod vault-2
+	source variables.env && cd vault && terraform init && terraform apply
 
 k8s-java:
 	kubectl apply -f kubernetes/expense-v2.yaml
@@ -162,17 +165,16 @@ clean-k8s-report:
 	kubectl delete --ignore-not-found -f kubernetes/report.yaml
 
 clean-k8s-ingress:
-	kubectl delete --ignore-not-found -f kubernetes/ingress-gateway.yaml
+	kubectl delete --ignore-not-found -f kubernetes/ingress-gateway.yaml || true
 	helm del report || true
-	kubectl delete --ignore-not-found $(shell kubectl get crds -o name | grep kong)
+	kubectl delete --ignore-not-found $(shell kubectl get crds -o name | grep kong) || true
 
 clean-k8s-jaeger:
-	kubectl delete -f kubernetes/jaeger.yaml || true
+	kubectl delete --ignore-not-found -f kubernetes/jaeger.yaml
 
 clean-k8s-consul:
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
 	kubectl delete --ignore-not-found -f kubernetes/router.yaml
-	kubectl delete --ignore-not-found -f kubernetes/proxy-defaults.yaml
 	kubectl delete --ignore-not-found -f kubernetes/intentions.yaml
 	helm del consul || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l chart=consul-helm -o name)
@@ -180,18 +182,15 @@ clean-k8s-consul:
 	kubectl delete --ignore-not-found serviceaccount consul-tls-init
 
 clean-k8s-grafana:
-	helm del grafana
+	helm del grafana || true
 
 clean-k8s-vault:
 	source variables.env && cd vault && terraform destroy -auto-approve || true
-	helm del vault || true
 	kubectl delete --ignore-not-found -f kubernetes/vault.yaml
 	helm del vault || true
-	helm del csi --namespace=kube-system || true
-	kubectl delete --ignore-not-found $(shell kubectl get pvc -l 'app.kubernetes.io/instance=vault' -o name)
-	rm -f secrets.env
+	kubectl delete --ignore-not-found $(shell kubectl get pvc -l 'app.kubernetes.io/instance=vault' -o name) || true
 
-clean-k8s: clean-k8s-ingress clean-k8s-report clean-k8s-expense k8s-vault-leases-revoke clean-k8s-database clean-k8s-jaeger clean-k8s-grafana clean-k8s-vault clean-k8s-consul
+clean-k8s: clean-k8s-report clean-k8s-expense k8s-vault-leases-revoke clean-k8s-database clean-k8s-vault clean-k8s-ingress clean-k8s-jaeger clean-k8s-grafana clean-k8s-consul
 
 k8s-get-expense:
 	curl -s http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")/api/expense
@@ -223,5 +222,5 @@ k8s-vault-leases:
 	vault list sys/leases/lookup/expense/database/mssql/creds/expense
 
 k8s-vault-leases-revoke:
-	source variables.env && vault lease revoke -prefix expense/database/mysql/creds
-	source variables.env && vault lease revoke -prefix expense/database/mssql/creds
+	source variables.env && vault lease revoke -prefix expense/database/mysql/creds || true
+	source variables.env && vault lease revoke -prefix expense/database/mssql/creds || true
