@@ -18,15 +18,15 @@ services:
       CONSUL_GRPC_ADDR: 10.5.0.2:8502
       SERVICE_CONFIG: /config/expense-java.hcl
     volumes:
-      - "./service_config:/config"
+      - "./compose_configs/service_config:/config"
     command: ["consul", "connect", "envoy","-sidecar-for", "expense-java"]
     network_mode: "service:expense-java"
   expense_agent_java:
-    image: consul:1.9.5
+    image: consul:1.10.3
     restart: always
     command: ["consul","agent","-config-file=/config/agent.hcl","-config-dir=/config"]
     volumes:
-      - "./consul_agent_config:/config"
+      - "./compose_configs/consul_agent_config:/config"
     network_mode: "service:expense-java"
 
   expense-dotnet:
@@ -44,7 +44,7 @@ services:
       CONSUL_GRPC_ADDR: 10.5.0.2:8502
       SERVICE_CONFIG: /config/expense-dotnet.hcl
     volumes:
-      - "./service_config:/config"
+      - "./compose_configs/service_config:/config"
     command: ["consul", "connect", "envoy","-sidecar-for", "expense-dotnet"]
     network_mode: "service:expense-dotnet"
 

@@ -5,7 +5,7 @@ services:
     image: consul:1.10.3
     command: ["consul","agent","-config-file=/config/consul-single-dc.hcl","-config-dir=/config"]
     volumes:
-      - "./consul_config:/config"
+      - "./compose_configs/consul_config:/config"
     ports:
       - 8500:8500
     networks:
@@ -29,7 +29,7 @@ services:
       CONSUL_GRPC_ADDR: 10.5.0.2:8502
       SERVICE_CONFIG: /config/expensedb-mysql.hcl
     volumes:
-      - "./service_config:/config"
+      - "./compose_configs/service_config:/config"
     command: ["consul", "connect", "envoy","-sidecar-for", "expense-db-mysql"]
     network_mode: "service:expense-db-mysql"
 
@@ -51,7 +51,7 @@ services:
       CONSUL_GRPC_ADDR: 10.5.0.2:8502
       SERVICE_CONFIG: /config/expensedb-mssql.hcl
     volumes:
-      - "./service_config:/config"
+      - "./compose_configs/service_config:/config"
     command: ["consul", "connect", "envoy","-sidecar-for", "expense-db-mssql"]
     network_mode: "service:expense-db-mssql"
 
@@ -98,7 +98,7 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./compose_configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
     networks:
       vpcbr:
         ipv4_address: 10.5.0.12

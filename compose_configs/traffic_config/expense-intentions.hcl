@@ -4,5 +4,5 @@ Sources = [
   {
     Name   = "report"
     Action = "allow"
-  },
+  }
 ]
