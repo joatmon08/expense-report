@@ -23,6 +23,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
     konghq.com/preserve-host: "false"
+    konghq.com/plugins: tracing
 spec:
   rules:
     - http:
@@ -43,19 +44,16 @@ spec:
                   number: 5001
 ---
 apiVersion: configuration.konghq.com/v1
-kind: KongClusterPlugin
+kind: KongPlugin
 metadata:
   name: tracing
   annotations:
     kubernetes.io/ingress.class: kong
-  labels:
-    global: "true"
 config:
-  http_endpoint: http://jaeger:9411/api/v2/spans
-  sample_ratio: 0.001
-  include_credential: true
+  http_endpoint: http://jaeger.default.svc.cluster.local:9411/api/v2/spans
+  sample_ratio: 1
   traceid_byte_count: 16
-  header_type: b3
+  header_type: preserve
   default_header_type: b3
   tags_header: Zipkin-Tags
 plugin: zipkin

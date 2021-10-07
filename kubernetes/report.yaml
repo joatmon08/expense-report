@@ -7,6 +7,7 @@ metadata:
     app: report
   annotations:
     ingress.kubernetes.io/service-upstream: "true"
+    konghq.com/plugins: tracing
 spec:
   selector:
     app: report

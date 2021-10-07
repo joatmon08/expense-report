@@ -92,6 +92,8 @@ kubeconfig:
 
 k8s-consul: kubeconfig
 	helm upgrade --install consul hashicorp/consul -f helm/consul.yaml
+	kubectl apply -f kubernetes/intentions.yaml
+	kubectl apply -f kubernetes/proxy-defaults.yaml
 
 k8s-grafana:
 	helm upgrade --install grafana grafana/grafana -f helm/grafana.yaml
@@ -110,8 +112,6 @@ k8s-vault-init:
 	source variables.env && cd vault && terraform init && terraform apply
 
 k8s-jaeger:
-	kubectl apply -f kubernetes/proxy-defaults.yaml
-	kubectl apply -f kubernetes/intentions.yaml
 	kubectl apply -f kubernetes/jaeger.yaml
 
 k8s-database:
@@ -120,6 +120,11 @@ k8s-database:
 	kubectl apply -f kubernetes/database-mssql.yaml
 	kubectl rollout status deployment expense-db-mssql
 	source variables.env && cd vault && terraform init && terraform apply
+
+k8s-ingress:
+	helm upgrade --install report kong/kong -f helm/kong.yaml
+	kubectl rollout status deployment report-kong
+	kubectl apply -f kubernetes/ingress-gateway.yaml
 
 k8s-java:
 	kubectl apply -f kubernetes/expense-v2.yaml
@@ -135,11 +140,6 @@ k8s-report:
 	kubectl apply -f kubernetes/report-v2.yaml
 	kubectl apply -f kubernetes/router.yaml
 	kubectl apply -f kubernetes/report-v3.yaml
-
-k8s-ingress:
-	helm upgrade --install report kong/kong -f helm/kong.yaml
-	kubectl rollout status deployment report-kong
-	kubectl apply -f kubernetes/ingress-gateway.yaml
 
 clean-k8s-java:
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
@@ -167,13 +167,13 @@ clean-k8s-ingress:
 	kubectl delete --ignore-not-found $(shell kubectl get crds -o name | grep kong)
 
 clean-k8s-jaeger:
-	kubectl delete -f kubernetes/intentions.yaml || true
 	kubectl delete -f kubernetes/jaeger.yaml || true
 
 clean-k8s-consul:
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
 	kubectl delete --ignore-not-found -f kubernetes/router.yaml
 	kubectl delete --ignore-not-found -f kubernetes/proxy-defaults.yaml
+	kubectl delete --ignore-not-found -f kubernetes/intentions.yaml
 	helm del consul || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l chart=consul-helm -o name)
 	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)
@@ -211,7 +211,7 @@ k8s-get-report-debug:
 
 k8s-circuit-break:
 	kubectl delete --ignore-not-found deployment expense-db-mysql
-	locust --autostart --autoquit -f locust/locustfile.py --users 30 --spawn-rate 5 -t 15m \
+	locust --autostart --autoquit 30 -f locust/locustfile.py --users 30 --spawn-rate 5 -t 15m \
 		-H http://$(shell kubectl get svc report-kong-proxy -o jsonpath="{.status.loadBalancer.ingress[*].ip}")
 
 k8s-circuit-break-recover: k8s-database
