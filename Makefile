@@ -97,26 +97,22 @@ k8s-grafana:
 	helm upgrade --install grafana grafana/grafana -f helm/grafana.yaml
 
 k8s-vault:
-	helm upgrade --install csi secrets-store-csi-driver/secrets-store-csi-driver --namespace kube-system  -f helm/csi.yaml
+	cd terraform && terraform output -raw vault_helm > ../helm/vault.yaml
 	helm upgrade --install vault hashicorp/vault -f helm/vault.yaml
 	kubectl apply -f kubernetes/vault.yaml
 
 k8s-vault-init:
 	kubectl exec -it vault-0 -c vault -- vault operator init -format=json > vault-root.json || true
 	kubectl wait --for=condition=ready pod vault-0
+	kubectl delete --ignore-not-found pods vault-1 vault-2
 	kubectl wait --for=condition=ready pod vault-1
 	kubectl wait --for=condition=ready pod vault-2
 	source variables.env && cd vault && terraform init && terraform apply
 
 k8s-jaeger:
-	kubectl apply -f kubernetes/jaeger.yaml
 	kubectl apply -f kubernetes/proxy-defaults.yaml
 	kubectl apply -f kubernetes/intentions.yaml
-
-k8s-ingress:
-	helm upgrade --install report kong/kong -f helm/kong.yaml
-	kubectl rollout status deployment report-kong
-	kubectl apply -f kubernetes/ingress-gateway.yaml
+	kubectl apply -f kubernetes/jaeger.yaml
 
 k8s-database:
 	kubectl apply -f kubernetes/database-mysql.yaml
@@ -139,6 +135,11 @@ k8s-report:
 	kubectl apply -f kubernetes/report-v2.yaml
 	kubectl apply -f kubernetes/router.yaml
 	kubectl apply -f kubernetes/report-v3.yaml
+
+k8s-ingress:
+	helm upgrade --install report kong/kong -f helm/kong.yaml
+	kubectl rollout status deployment report-kong
+	kubectl apply -f kubernetes/ingress-gateway.yaml
 
 clean-k8s-java:
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
@@ -168,11 +169,11 @@ clean-k8s-ingress:
 clean-k8s-jaeger:
 	kubectl delete -f kubernetes/intentions.yaml || true
 	kubectl delete -f kubernetes/jaeger.yaml || true
-	kubectl delete -f kubernetes/proxy-defaults.yaml
 
 clean-k8s-consul:
 	kubectl delete --ignore-not-found -f kubernetes/splitter.yaml
 	kubectl delete --ignore-not-found -f kubernetes/router.yaml
+	kubectl delete --ignore-not-found -f kubernetes/proxy-defaults.yaml
 	helm del consul || true
 	kubectl delete --ignore-not-found $(shell kubectl get pvc -l chart=consul-helm -o name)
 	kubectl delete --ignore-not-found $(shell kubectl get secret -o name | grep consul)

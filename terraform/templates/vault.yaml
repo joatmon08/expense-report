@@ -33,6 +33,13 @@ server:
 
         service_registration "kubernetes" {}
 
+        seal "gcpckms" {
+          project     = "${project}"
+          region      = "${region}"
+          key_ring    = "${key_ring}"
+          crypto_key  = "${crypto_key}"
+        }
+
 ui:
   enabled: true
   serviceType: LoadBalancer
