@@ -97,13 +97,6 @@ k8s-ingress:
 	kubectl rollout status deployment report-kong
 	kubectl apply -f kubernetes/ingress-gateway.yaml
 
-k8s-database:
-	kubectl apply -f kubernetes/database-mysql.yaml
-	kubectl rollout status deployment expense-db-mysql
-	kubectl apply -f kubernetes/database-mssql.yaml
-	kubectl rollout status deployment expense-db-mssql
-	source variables.env && cd vault && terraform init && terraform apply
-
 k8s-vault:
 	cd terraform && terraform output -raw vault_helm > ../helm/vault.yaml
 	helm upgrade --install vault hashicorp/vault -f helm/vault.yaml
@@ -118,6 +111,13 @@ k8s-vault-init:
 	kubectl wait --for=condition=ready pod vault-2
 	source variables.env && cd vault && terraform init && terraform apply
 
+k8s-database:
+	kubectl apply -f kubernetes/database-mssql.yaml
+	kubectl rollout status deployment expense-db-mssql
+	kubectl apply -f kubernetes/database-mysql.yaml
+	kubectl rollout status deployment expense-db-mysql
+	source variables.env && cd vault && terraform init && terraform apply
+
 k8s-java:
 	kubectl apply -f kubernetes/expense-v2.yaml
 	kubectl apply -f kubernetes/splitter.yaml
@@ -127,9 +127,13 @@ k8s-dotnet:
 
 k8s-expense: k8s-dotnet k8s-java
 
-k8s-report:
+k8s-report: k8s-report-v2 k8s-report-v3
+
+k8s-report-v2:
 	kubectl apply -f kubernetes/report.yaml
 	kubectl apply -f kubernetes/report-v2.yaml
+
+k8s-report-v3:
 	kubectl apply -f kubernetes/router.yaml
 	kubectl apply -f kubernetes/report-v3.yaml
 
