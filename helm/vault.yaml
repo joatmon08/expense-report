@@ -7,31 +7,11 @@ server:
     consul.hashicorp.com/connect-service: 'vault'
     consul.hashicorp.com/connect-service-port: '8200'
     consul.hashicorp.com/connect-service-upstreams: 'expense-db-mysql:3306,expense-db-mssql:1433'
-    consul.hashicorp.com/transparent-proxy-exclude-outbound-cidrs: "199.36.153.4/30"
     consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "8200,8201"
     consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "8200,8201"
-  ha:
+  dev:
     enabled: true
-    raft:
-      enabled: true
-      config: |
-        disable_mlock = true
-        ui = true
-
-        listener "tcp" {
-          tls_disable = 1
-          address = "[::]:8200"
-          cluster_address = "[::]:8201"
-        }
-
-        storage "raft" {
-          path = "/vault/data"
-          retry_join {
-            leader_api_addr = "http://vault:8200"
-          }
-        }
-
-        service_registration "kubernetes" {}
+    devRootToken: "root"
 
 ui:
   enabled: true

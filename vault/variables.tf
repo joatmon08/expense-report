@@ -1,11 +1,12 @@
 variable "cluster_name" {
   type        = string
-  description = "cluster name from GKE"
+  description = "cluster name"
 }
 
 variable "cluster_zone" {
   type        = string
   description = "cluster zone from GKE"
+  default     = ""
 }
 
 variable "namespace" {
@@ -69,23 +70,4 @@ variable "mssql_port" {
   type        = string
   description = "port for mysql database"
   default     = "1433"
-}
-
-data "google_client_config" "default" {}
-
-data "google_container_cluster" "cluster" {
-  name     = var.cluster_name
-  location = var.cluster_zone
-}
-
-data "kubernetes_service_account" "vault" {
-  metadata {
-    name = "vault"
-  }
-}
-
-data "kubernetes_secret" "vault" {
-  metadata {
-    name = data.kubernetes_service_account.vault.default_secret_name
-  }
 }

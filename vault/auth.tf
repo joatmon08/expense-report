@@ -1,13 +1,23 @@
+data "kubernetes_service_account" "vault" {
+  metadata {
+    name = "vault"
+  }
+}
+
+data "kubernetes_secret" "vault" {
+  metadata {
+    name = data.kubernetes_service_account.vault.default_secret_name
+  }
+}
 resource "vault_auth_backend" "kubernetes" {
   type = "kubernetes"
 }
 
 resource "vault_kubernetes_auth_backend_config" "cluster" {
   backend                = vault_auth_backend.kubernetes.path
-  kubernetes_host        = "https://${data.google_container_cluster.cluster.endpoint}:443"
+  kubernetes_host        = local.host
   kubernetes_ca_cert     = data.kubernetes_secret.vault.data["ca.crt"]
   token_reviewer_jwt     = data.kubernetes_secret.vault.data["token"]
-  issuer                 = "https://container.googleapis.com/v1/projects/${data.google_client_config.default.project}/locations/${var.cluster_zone}/clusters/${var.cluster_name}"
   disable_iss_validation = "true"
 }
 

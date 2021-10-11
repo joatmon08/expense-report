@@ -1,5 +1,4 @@
-cluster_zone   = "us-central1-c"
-cluster_name   = "kubecon"
+cluster_name   = "multi-cloud-k8s"
 application    = "expense"
 application_v2 = "expense-v2"
 mysql_service  = "expense-db-mysql"
