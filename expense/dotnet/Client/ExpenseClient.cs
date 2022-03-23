@@ -1,27 +1,23 @@
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using Expense.Models;
-using System.Threading.Tasks;
-using System.Net.Http;
+using System.Text.Json;
+using expense.Models;
 
-namespace Expense.Client
+namespace expense.Client;
+
+public class ExpenseClient : IExpenseClient
 {
-  public class ExpenseClient : IExpenseClient
+  private readonly HttpClient _httpClient;
+  public ExpenseClient(HttpClient httpClient)
   {
-    private readonly HttpClient _httpClient;
-    public ExpenseClient(HttpClient httpClient)
-    {
-      _httpClient = httpClient;
-    }
+    _httpClient = httpClient;
+  }
 
-    public async Task<List<ExpenseItem>> GetExpensesForTrip(string tripId) {
-      var result = await _httpClient.GetStringAsync(_httpClient.BaseAddress + "api/expense/trip/" + tripId).ConfigureAwait(false);
-      return JsonConvert.DeserializeObject<List<ExpenseItem>>(result);
-    }
+  public async Task<List<ExpenseItem>> GetExpensesForTrip(string tripId) {
+    var result = await _httpClient.GetStringAsync(_httpClient.BaseAddress + "api/expense/trip/" + tripId).ConfigureAwait(false);
+    return JsonSerializer.Deserialize<List<ExpenseItem>>(result);
+  }
 
-    public async Task<string> GetExpenseVersion() {
-      var result = await _httpClient.GetStringAsync(_httpClient.BaseAddress + "api").ConfigureAwait(false);
-      return result.ToString();
-    }
+  public async Task<string> GetExpenseVersion() {
+    var result = await _httpClient.GetStringAsync(_httpClient.BaseAddress + "api").ConfigureAwait(false);
+    return result.ToString();
   }
 }

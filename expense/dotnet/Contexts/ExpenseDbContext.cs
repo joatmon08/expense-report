@@ -1,14 +1,12 @@
-using Expense.Models;
+using expense.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Expense.Contexts
+namespace expense.Contexts;
+public class ExpenseDbContext : DbContext
 {
-    public class ExpenseDbContext : DbContext
+    public ExpenseDbContext(DbContextOptions<ExpenseDbContext> options) : base(options)
     {
-        public ExpenseDbContext(DbContextOptions<ExpenseDbContext> options) : base(options)
-        {
-        }
-
-        public DbSet<ExpenseItem> ExpenseItems { get; set; }
     }
+
+    public DbSet<ExpenseItem> ExpenseItems { get; set; }
 }

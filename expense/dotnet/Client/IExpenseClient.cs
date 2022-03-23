@@ -1,12 +1,9 @@
-using System.Collections.Generic;
-using Expense.Models;
-using System.Threading.Tasks;
+using expense.Models;
 
-namespace Expense.Client
+namespace expense.Client;
+
+public interface IExpenseClient
 {
-    public interface IExpenseClient
-    {
-          Task<List<ExpenseItem>> GetExpensesForTrip(string tripId);
-          Task<string> GetExpenseVersion();
-    }
+    Task<List<ExpenseItem>> GetExpensesForTrip(string tripId);
+    Task<string> GetExpenseVersion();
 }

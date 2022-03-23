@@ -1,9 +1,6 @@
-using System.Threading.Tasks;
+namespace expense.Models;
 
-namespace Expense.Models
+public interface IVersionContext
 {
-    public interface IVersionContext
-    {
-        Task<string> GetVersion();
-    }
+    Task<string> GetVersion();
 }
