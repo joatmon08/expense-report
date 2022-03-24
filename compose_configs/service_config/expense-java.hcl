@@ -13,9 +13,9 @@ service {
     }
   ]
 
-  tags = ["java", "expense-report"]
+  tags = ["v2"]
   meta = {
-    framework = "java"
+    version = "v2"
   }
 
   connect {
