@@ -4,6 +4,7 @@ using expense.Models;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using OpenTelemetry.Exporter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +22,7 @@ var metricsEndpoint = builder.Configuration
 var tracingAgentHost = builder.Configuration
     .GetSection("Jaeger").GetValue<string>("AgentHost", "localhost");
 var tracingAgentPort = builder.Configuration
-    .GetSection("Jaeger").GetValue<int>("AgentPort", 6831);
+    .GetSection("Jaeger").GetValue<int>("AgentPort", 9411);
 
 builder.Services.AddOpenTelemetryMetrics(b =>
 {
@@ -42,12 +43,14 @@ builder.Services.AddOpenTelemetryTracing(b =>
     {
         o.AgentHost = tracingAgentHost;
         o.AgentPort = tracingAgentPort;
+        o.Protocol = JaegerExportProtocol.HttpBinaryThrift;
     })
     .AddSource(serviceName)
     .SetResourceBuilder(
         ResourceBuilder.CreateDefault()
             .AddService(serviceName: serviceName, serviceVersion: serviceVersion))
-    .AddSqlClientInstrumentation(o => {
+    .AddSqlClientInstrumentation(o =>
+    {
         o.SetDbStatementForText = true;
     })
     .AddHttpClientInstrumentation()
