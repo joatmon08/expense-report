@@ -7,6 +7,11 @@ using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var databaseFile = Environment
+    .GetEnvironmentVariable("DATABASE_FILE") ?? "dbsettings.json";
+builder.Configuration
+    .AddJsonFile(databaseFile, optional: false, reloadOnChange: true);
+
 var serviceName = builder.Configuration.GetValue<string>("Name");
 var serviceVersion = builder.Configuration.GetValue<string>("Version");
 
@@ -65,7 +70,7 @@ builder.Services.AddTransient<IVersionContext>(s => new VersionContext(
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseExceptionHandler("/Error");
     app.UseForwardedHeaders();
