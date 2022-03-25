@@ -4,7 +4,6 @@ using expense.Models;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using OpenTelemetry.Exporter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,13 +15,9 @@ builder.Configuration
 var serviceName = builder.Configuration.GetValue<string>("Name");
 var serviceVersion = builder.Configuration.GetValue<string>("Version");
 
-var metricsEndpoint = builder.Configuration
-    .GetValue<string>("MetricsEndpoint", "http://localhost:9464/");
+var metricsEndpoint = builder.Configuration["MetricsEndpoint"] ?? "http://localhost:9464/";
 
-var tracingAgentHost = builder.Configuration
-    .GetSection("Jaeger").GetValue<string>("AgentHost", "localhost");
-var tracingAgentPort = builder.Configuration
-    .GetSection("Jaeger").GetValue<int>("AgentPort", 9411);
+var tracingUri = builder.Configuration["Zipkin"] ?? "http://localhost:9411/api/v2/spans";
 
 builder.Services.AddOpenTelemetryMetrics(b =>
 {
@@ -39,12 +34,6 @@ builder.Services.AddOpenTelemetryMetrics(b =>
 builder.Services.AddOpenTelemetryTracing(b =>
 {
     b
-    .AddJaegerExporter(o =>
-    {
-        o.AgentHost = tracingAgentHost;
-        o.AgentPort = tracingAgentPort;
-        o.Protocol = JaegerExportProtocol.HttpBinaryThrift;
-    })
     .AddSource(serviceName)
     .SetResourceBuilder(
         ResourceBuilder.CreateDefault()
@@ -54,7 +43,11 @@ builder.Services.AddOpenTelemetryTracing(b =>
         o.SetDbStatementForText = true;
     })
     .AddHttpClientInstrumentation()
-    .AddAspNetCoreInstrumentation();
+    .AddAspNetCoreInstrumentation()
+    .AddZipkinExporter(o =>
+    {
+        o.Endpoint = new Uri(tracingUri);
+    });
 });
 
 // Add services to the container.

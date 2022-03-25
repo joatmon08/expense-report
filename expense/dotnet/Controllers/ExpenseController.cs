@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using expense.Models;
 
 namespace expense.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[SwaggerTag("expense")]
 public class ExpenseController : ControllerBase
 {
     private readonly IExpenseContext _context;

@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using expense.Models;
 namespace expense.Controllers;
 
 [Route("api")]
 [ApiController]
+[SwaggerTag("expense")]
 public class VersionController : ControllerBase
 {
 
