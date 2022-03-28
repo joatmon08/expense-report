@@ -36,9 +36,9 @@ compose-consul:
 compose-expense:
 	docker-compose -f docker-compose-expense.yml up -d
 	consul config write compose_configs/traffic_config/expense-intentions.hcl
-	consul config write compose_configs/traffic_config/expense-resolver.hcl
-	consul config write compose_configs/traffic_config/expense-splitter.hcl
-	consul config write compose_configs/traffic_config/expense-router.hcl
+	# consul config write compose_configs/traffic_config/expense-resolver.hcl
+	# consul config write compose_configs/traffic_config/expense-splitter.hcl
+	# consul config write compose_configs/traffic_config/expense-router.hcl
 
 compose-report:
 	docker-compose -f docker-compose-report.yml up -d

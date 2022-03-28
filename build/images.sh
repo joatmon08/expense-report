@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DOTNET_VERSION="${DOTNET_VERSION:-6.0}"
-JAVA_VERSION="${JAVA_VERSION:-6.0}"
+JAVA_VERSION="${JAVA_VERSION:-2.6.5}"
 
 function report() {
 	docker build --no-cache -t joatmon08/report:dotnet-${DOTNET_VERSION} -f report/dotnet/Dockerfile .

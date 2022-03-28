@@ -11,7 +11,6 @@ public class ExpenseClient : IExpenseClient
 
   public async Task<List<ExpenseItem>> GetExpensesForTrip(string tripId) {
     HttpResponseMessage response = await _httpClient.GetAsync(_httpClient.BaseAddress + "api/expense/trip/" + tripId);
-    response.EnsureSuccessStatusCode();
     return await response.Content.ReadFromJsonAsync<List<ExpenseItem>>();
   }
 

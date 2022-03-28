@@ -1,52 +1,53 @@
 version: "3.3"
 services:
-  # expense-java:
-  #   image: joatmon08/expense:java
-  #   restart: always
-  #   environment:
-  #     JAEGER_HOST: jaeger
-  #   networks:
-  #     vpcbr:
-  #       ipv4_address: 10.5.0.4
-  #   ports:
-  #     - 18080:8080
-  # expense_proxy_java:
-  #   image: joatmon08/consul-envoy:v1.11.4-v1.20.2
-  #   restart: always
-  #   environment:
-  #     CONSUL_HTTP_ADDR: 10.5.0.2:8500
-  #     CONSUL_GRPC_ADDR: 10.5.0.2:8502
-  #     SERVICE_CONFIG: /config/expense-java.hcl
-  #   volumes:
-  #     - "./compose_configs/service_config:/config"
-  #   command: ["consul", "connect", "envoy","-sidecar-for", "expense-java"]
-  #   network_mode: "service:expense-java"
-  # expense_agent_java:
-  #   image: consul:1.11.4
-  #   restart: always
-  #   command: ["consul","agent","-config-file=/config/agent.hcl","-config-dir=/config"]
-  #   volumes:
-  #     - "./compose_configs/consul_agent_config:/config"
-  #   network_mode: "service:expense-java"
-
-  expense-dotnet:
-    image: joatmon08/expense:dotnet-6.0
+  expense-java:
+    image: joatmon08/expense:java-2.6.5
+    restart: always
+    environment:
+      JAEGER: jaeger
+      SPRING_CONFIG_LOCATION: /app/application.properties
     networks:
       vpcbr:
-        ipv4_address: 10.5.0.7
+        ipv4_address: 10.5.0.4
     ports:
-      - 15001:80
-  expense_proxy_dotnet:
+      - 18080:8080
+  expense_proxy_java:
     image: joatmon08/consul-envoy:v1.11.4-v1.20.2
     restart: always
     environment:
       CONSUL_HTTP_ADDR: 10.5.0.2:8500
       CONSUL_GRPC_ADDR: 10.5.0.2:8502
-      SERVICE_CONFIG: /config/expense-dotnet.hcl
+      SERVICE_CONFIG: /config/expense-java.hcl
     volumes:
       - "./compose_configs/service_config:/config"
-    command: ["consul", "connect", "envoy","-sidecar-for", "expense-dotnet"]
-    network_mode: "service:expense-dotnet"
+    command: ["consul", "connect", "envoy","-sidecar-for", "expense-java"]
+    network_mode: "service:expense-java"
+  expense_agent_java:
+    image: consul:1.11.4
+    restart: always
+    command: ["consul","agent","-config-file=/config/agent.hcl","-config-dir=/config"]
+    volumes:
+      - "./compose_configs/consul_agent_config:/config"
+    network_mode: "service:expense-java"
+
+  # expense-dotnet:
+  #   image: joatmon08/expense:dotnet-6.0
+  #   networks:
+  #     vpcbr:
+  #       ipv4_address: 10.5.0.7
+  #   ports:
+  #     - 15001:80
+  # expense_proxy_dotnet:
+  #   image: joatmon08/consul-envoy:v1.11.4-v1.20.2
+  #   restart: always
+  #   environment:
+  #     CONSUL_HTTP_ADDR: 10.5.0.2:8500
+  #     CONSUL_GRPC_ADDR: 10.5.0.2:8502
+  #     SERVICE_CONFIG: /config/expense-dotnet.hcl
+  #   volumes:
+  #     - "./compose_configs/service_config:/config"
+  #   command: ["consul", "connect", "envoy","-sidecar-for", "expense-dotnet"]
+  #   network_mode: "service:expense-dotnet"
 
 networks:
   vpcbr:
