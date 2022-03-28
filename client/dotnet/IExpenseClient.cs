@@ -1,5 +1,3 @@
-using expense.Models;
-
 namespace expense.Client;
 
 public interface IExpenseClient
