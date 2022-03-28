@@ -1,19 +1,16 @@
-using Expense.Models;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+using expense.Models;
 
-namespace Report.Models
+namespace report.Models;
+
+public class ReportTotal
 {
-    public class ReportTotal
-    {
-        public string TripId { get; set; }
-        public IList<ExpenseItem> Expenses { get; set; } = new List<ExpenseItem>();
-        public decimal Total { get; set; }
+    public string TripId { get; set; }
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public int? NumberOfExpenses { get; set; }
+    public IList<ExpenseItem> Expenses { get; set; } = new List<ExpenseItem>();
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? TotalReimbursable { get; set; }
-    }
+    public decimal Total { get; set; }
+
+    public int? NumberOfExpenses { get; set; }
+
+    public decimal? TotalReimbursable { get; set; }
 }

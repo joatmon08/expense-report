@@ -1,90 +1,88 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Report.Models;
-using Expense.Client;
-using System.Collections.Generic;
-using Expense.Models;
+using report.Models;
+using expense.Client;
+using expense.Models;
 
-namespace expense.Controllers
+namespace report.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[Tags("Report")]
+
+public class ReportController : ControllerBase
 {
-  [Route("api/[controller]")]
-  [ApiController]
+  private readonly IExpenseClient _client;
 
-  public class ReportController : ControllerBase
+  public ReportController(IExpenseClient client)
   {
-    private readonly IExpenseClient _client;
+    _client = client;
+  }
 
-    public ReportController(IExpenseClient client)
+  [HttpGet("expense/version")]
+  public async Task<ActionResult<string>> GetVersion()
+  {
+    return await _client.GetExpenseVersion();
+  }
+
+  [HttpGet("trip/{id}")]
+  public async Task<ActionResult<ReportTotal>> GetReportForTrip(string id)
+  {
+    var items = await _client.GetExpensesForTrip(id);
+    List<ExpenseItem> copied = new List<ExpenseItem>(items);
+    var report = CreateReport(id, copied);
+    if (report == null)
     {
-      _client = client;
+      return NotFound();
     }
+    return report;
+  }
 
-    [HttpGet("expense/version")]
-    public async Task<ActionResult<string>> GetVersion()
+  private ReportTotal CreateReport(string tripId, IList<ExpenseItem> items)
+  {
+    decimal total = getTotal(items);
+
+    ReportTotal reportTotal = new ReportTotal
     {
-      return await _client.GetExpenseVersion();
+      TripId = tripId,
+      Total = total,
+      Expenses = items
+    };
+
+    addNumItems(reportTotal);
+    addTotalReimbursable(reportTotal, items);
+
+    return reportTotal;
+  }
+
+  private decimal getTotal(IList<ExpenseItem> items)
+  {
+    decimal total = 0;
+    foreach (ExpenseItem item in items)
+    {
+      total += item.Cost;
     }
+    return total;
+  }
 
-    [HttpGet("trip/{id}")]
-    public async Task<ActionResult<ReportTotal>> GetReportForTrip(string id)
+  private decimal getTotalReimbursable(IList<ExpenseItem> items) {
+    decimal reimbursable = 0;
+    foreach (ExpenseItem item in items)
     {
-      var items = await _client.GetExpensesForTrip(id);
-      List<ExpenseItem> copied = new List<ExpenseItem>(items);
-      var report = CreateReport(id, copied);
-      if (report == null)
+      if (item.Reimbursable == true)
       {
-        return NotFound();
+        reimbursable += item.Cost;
       }
-      return report;
     }
+    return reimbursable;
+  }
 
-    private ReportTotal CreateReport(string tripId, IList<ExpenseItem> items)
-    {
-      decimal total = getTotal(items);
+  private void addNumItems(ReportTotal reportTotal)
+  {
+      reportTotal.NumberOfExpenses = reportTotal.Expenses.Count;
+  }
 
-      ReportTotal reportTotal = new ReportTotal
-      {
-        TripId = tripId,
-        Total = total,
-        Expenses = items
-      };
-
-      addNumItems(reportTotal);
-      addTotalReimbursable(reportTotal, items);
-
-      return reportTotal;
-    }
-
-    private decimal getTotal(IList<ExpenseItem> items)
-    {
-      decimal total = 0;
-      foreach (ExpenseItem item in items)
-      {
-        total += item.Cost;
-      }
-      return total;
-    }
-
-    private decimal getTotalReimbursable(IList<ExpenseItem> items) {
-      decimal reimbursable = 0;
-      foreach (ExpenseItem item in items)
-      {
-        if (item.Reimbursable == true)
-        {
-          reimbursable += item.Cost;
-        }
-      }
-      return reimbursable;
-    }
-
-    private void addNumItems(ReportTotal reportTotal)
-    {
-        reportTotal.NumberOfExpenses = reportTotal.Expenses.Count;
-    }
-
-    private void addTotalReimbursable(ReportTotal reportTotal, IList<ExpenseItem> items)
-    {
-      reportTotal.TotalReimbursable = getTotalReimbursable(items);;
-    }
+  private void addTotalReimbursable(ReportTotal reportTotal, IList<ExpenseItem> items)
+  {
+    reportTotal.TotalReimbursable = getTotalReimbursable(items);;
   }
 }

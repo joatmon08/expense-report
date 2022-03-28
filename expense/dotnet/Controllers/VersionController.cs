@@ -5,7 +5,7 @@ namespace expense.Controllers;
 
 [Route("api")]
 [ApiController]
-[SwaggerTag("expense")]
+[Tags("Expense")]
 public class VersionController : ControllerBase
 {
 
