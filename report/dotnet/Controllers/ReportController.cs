@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using report.Models;
 using expense.Client;
-using expense.Models;
 
 namespace report.Controllers;
 

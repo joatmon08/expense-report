@@ -1,4 +1,4 @@
-using expense.Models;
+using expense.Client;
 
 namespace report.Models;
 

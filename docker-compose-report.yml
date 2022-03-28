@@ -1,12 +1,12 @@
 version: "3.3"
 services:
   report:
-    image: joatmon08/report:dotnet
+    image: joatmon08/report:dotnet-6.0
     networks:
       vpcbr:
         ipv4_address: 10.5.0.5
     ports:
-      - 5002:5002
+      - 15002:80
     volumes:
       - "./report:/etc/report"
   report_proxy:

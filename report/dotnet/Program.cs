@@ -13,7 +13,7 @@ var metricsEndpoint = builder.Configuration["MetricsEndpoint"] ?? "http://localh
 
 var tracingUri = builder.Configuration["Zipkin"] ?? "http://localhost:9411/api/v2/spans";
 
-var expenseUri = builder.Configuration["Expenses"] ?? "https://localhost:5002";
+var expenseUri = builder.Configuration["Expenses"] ?? "http://localhost:5001";
 
 builder.Services.AddOpenTelemetryMetrics(b =>
 {
