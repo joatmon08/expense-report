@@ -4,7 +4,7 @@ services:
     image: joatmon08/expense:java-2.6.5
     restart: always
     environment:
-      JAEGER: jaeger
+      OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://jaeger:9411/api/v2/spans
       SPRING_CONFIG_LOCATION: /app/application.properties
     networks:
       vpcbr:
