@@ -3,6 +3,9 @@
 DOTNET_VERSION="${DOTNET_VERSION:-6.0}"
 JAVA_VERSION="${JAVA_VERSION:-2.6.5}"
 
+MYSQL_VERSION="${MSQL_VERSION:-8}"
+MSSQL_VERSION="${MSSQL_VERSION:-2019}"
+
 function report() {
 	docker build --no-cache -t joatmon08/report:dotnet-${DOTNET_VERSION} -f report/dotnet/Dockerfile .
 }
@@ -18,8 +21,8 @@ function database() {
 }
 
 function database_push() {
-    docker push joatmon08/expense-db:mssql
-	docker push joatmon08/expense-db:mysql
+    docker push joatmon08/expense-db:mssql-${MSSQL_VERSION}
+	docker push joatmon08/expense-db:mysql-${MYSQL_VERSION}
 }
 
 function app_push() {

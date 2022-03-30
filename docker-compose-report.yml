@@ -30,5 +30,4 @@ services:
 
 networks:
   vpcbr:
-    external:
-      name: expense-report_vpcbr
+    name: expense-report_vpcbr

@@ -30,26 +30,25 @@ services:
       - "./compose_configs/consul_agent_config:/config"
     network_mode: "service:expense-java"
 
-  # expense-dotnet:
-  #   image: joatmon08/expense:dotnet-6.0
-  #   networks:
-  #     vpcbr:
-  #       ipv4_address: 10.5.0.7
-  #   ports:
-  #     - 15001:80
-  # expense_proxy_dotnet:
-  #   image: joatmon08/consul-envoy:v1.11.4-v1.20.2
-  #   restart: always
-  #   environment:
-  #     CONSUL_HTTP_ADDR: 10.5.0.2:8500
-  #     CONSUL_GRPC_ADDR: 10.5.0.2:8502
-  #     SERVICE_CONFIG: /config/expense-dotnet.hcl
-  #   volumes:
-  #     - "./compose_configs/service_config:/config"
-  #   command: ["consul", "connect", "envoy","-sidecar-for", "expense-dotnet"]
-  #   network_mode: "service:expense-dotnet"
+  expense-dotnet:
+    image: joatmon08/expense:dotnet-6.0
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.7
+    ports:
+      - 15001:80
+  expense_proxy_dotnet:
+    image: joatmon08/consul-envoy:v1.11.4-v1.20.2
+    restart: always
+    environment:
+      CONSUL_HTTP_ADDR: 10.5.0.2:8500
+      CONSUL_GRPC_ADDR: 10.5.0.2:8502
+      SERVICE_CONFIG: /config/expense-dotnet.hcl
+    volumes:
+      - "./compose_configs/service_config:/config"
+    command: ["consul", "connect", "envoy","-sidecar-for", "expense-dotnet"]
+    network_mode: "service:expense-dotnet"
 
 networks:
   vpcbr:
-    external:
-      name: expense-report_vpcbr
+    name: expense-report_vpcbr
