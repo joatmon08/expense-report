@@ -7,22 +7,22 @@ MYSQL_VERSION="${MSQL_VERSION:-8}"
 MSSQL_VERSION="${MSSQL_VERSION:-2019}"
 
 function report() {
-	docker build --no-cache -t joatmon08/report:dotnet-${DOTNET_VERSION} -f report/dotnet/Dockerfile .
+    docker build --no-cache -t joatmon08/report:dotnet-${DOTNET_VERSION} -f report/dotnet/Dockerfile .
 }
 
 function expense() {
     docker build --no-cache -t joatmon08/expense:java-${JAVA_VERSION}  expense/java/
-	docker build --no-cache -t joatmon08/expense:dotnet-${DOTNET_VERSION} expense/dotnet/
+    docker build --no-cache -t joatmon08/expense:dotnet-${DOTNET_VERSION} expense/dotnet/
 }
 
 function database() {
     docker build --no-cache -t joatmon08/expense-db:mssql database/mssql/
-	docker build --no-cache -t joatmon08/expense-db:mysql database/mysql/
+    docker build --no-cache -t joatmon08/expense-db:mysql database/mysql/
 }
 
 function database_push() {
     docker push joatmon08/expense-db:mssql-${MSSQL_VERSION}
-	docker push joatmon08/expense-db:mysql-${MYSQL_VERSION}
+    docker push joatmon08/expense-db:mysql-${MYSQL_VERSION}
 }
 
 function app_push() {
