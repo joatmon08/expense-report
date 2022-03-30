@@ -114,16 +114,9 @@ $ make clean-k8s
 
 ## Docker-Compose
 
-In addition to using Consul Connect, the `expense` microservice
-demonstrates the use of [Spring Cloud Consul
-Config](https://cloud.spring.io/spring-cloud-consul/reference/html/)
-for retrieving application properties from Consul KV.
-
-Finally, the `report` microservice uses
-[consul-template](https://github.com/hashicorp/consul-template)
-to feature toggle the addition of a "Number of Items" field for the
-report.
-
+This is for local demonstration purposes only. The Consul server
+has a different configuration than what you would expect for production!
+It does not use Vault for dynamic secrets.
 ### Prerequisites
 
 * Docker
@@ -147,7 +140,7 @@ for the `expense` service.
 
 Open Jaeger on http://localhost:16686 and Consul on http://localhost:8500.
 
-### Service Networking with Consul Connect
+### Service Networking with Consul Service Mesh
 
 To try out:
 
