@@ -1,6 +1,6 @@
 plugins {
-	id 'org.springframework.boot' version '2.2.4.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id "org.springframework.boot" version "2.6.5"
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 }
 
@@ -17,10 +17,9 @@ springBoot {
 }
 
 dependencies {
-	compile 'org.springframework.cloud:spring-cloud-sleuth-zipkin:2.2.1.RELEASE'
-	compile 'io.zipkin.brave:brave-instrumentation-mysql8:5.9.3'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
 	runtimeOnly 'mysql:mysql-connector-java'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

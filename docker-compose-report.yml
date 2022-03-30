@@ -1,16 +1,16 @@
 version: "3.3"
 services:
   report:
-    image: joatmon08/report:dotnet
+    image: joatmon08/report:dotnet-6.0
     networks:
       vpcbr:
         ipv4_address: 10.5.0.5
     ports:
-      - 5002:5002
+      - 15002:80
     volumes:
       - "./report:/etc/report"
   report_proxy:
-    image: joatmon08/consul-envoy:v1.10.3-v1.18.4
+    image: joatmon08/consul-envoy:v1.11.4-v1.20.2
     restart: always
     environment:
       CONSUL_HTTP_ADDR: 10.5.0.2:8500
@@ -21,7 +21,7 @@ services:
     command: ["consul", "connect", "envoy","-sidecar-for", "report-dotnet"]
     network_mode: "service:report"
   report_agent:
-    image: consul:1.10.3
+    image: consul:1.11.4
     restart: always
     command: ["consul","agent","-config-file=/config/agent.hcl","-config-dir=/config"]
     volumes:
@@ -30,5 +30,4 @@ services:
 
 networks:
   vpcbr:
-    external:
-      name: expense-report_vpcbr
+    name: expense-report_vpcbr

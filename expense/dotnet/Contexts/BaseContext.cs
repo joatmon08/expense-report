@@ -1,12 +1,11 @@
-namespace Expense.Contexts
-{
-    public abstract class BaseContext
-    {
-        protected readonly ExpenseDbContext _context;
+namespace expense.Contexts;
 
-        public BaseContext(ExpenseDbContext context)
-        {
-            _context = context;
-        }
+public abstract class BaseContext
+{
+    protected readonly ExpenseDbContext _context;
+
+    public BaseContext(ExpenseDbContext context)
+    {
+        _context = context;
     }
 }

@@ -1,25 +1,24 @@
-using Expense.Models;
-using System.Threading.Tasks;
+using expense.Models;
 
-namespace Expense.Contexts
+namespace expense.Contexts;
+
+public class VersionContext : IVersionContext
 {
-    public class VersionContext : IVersionContext
+    protected readonly string _version;
+
+    public VersionContext(string version)
     {
-        protected readonly string _version;
+        _version = version;
+    }
 
-        public VersionContext(string version)
-        {
-            _version = version;
-        }
+    public async Task<string> GetVersion()
+    {
+        return await Task.Run(() => ReturnVersion());
+    }
 
-        public async Task<string> GetVersion() {
-           return await Task.Run(() => ReturnVersion());
-        }
 
-        
-        public string ReturnVersion()
-        {
-          return _version;
-        }
+    public string ReturnVersion()
+    {
+        return _version;
     }
 }

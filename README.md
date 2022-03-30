@@ -131,20 +131,21 @@ report.
 
 ### Startup
 
-1. To start, bring up the Consul server, MySQL database, Microsoft SQL
-   Server database, `consul-template`, Jaeger for tracing, and
-   the expense services in .NET Core and Java.
+To start, bring up the Consul server, MySQL database, Microsoft SQL
+Server database, Jaeger for tracing,
+the expense services in .NET and Java, and the report service
+in .NET.
 
-   ```shell
-   $ make all
-   ```
+```shell
+bash scripts/compose.sh all
+```
 
-   This will not only bring up the stack but add the application configuration
-   for the `expense` service.
+This will not only bring up the stack but add the application configuration
+for the `expense` service.
 
-   ![Consul UI after bringing up main stack](./image/makeall.png)
+![Consul UI after bringing up main stack](./image/makeall.png)
 
-1. Open Jaeger on http://localhost:16686 and Consul on http://localhost:8500.
+Open Jaeger on http://localhost:16686 and Consul on http://localhost:8500.
 
 ### Service Networking with Consul Connect
 
@@ -155,51 +156,76 @@ To try out:
 * Load balancing
 * Additional tracing metadata
 
-You can create the `report` service by running `make report-app`.
+#### Traffic Splitting
 
-### Circuit Breaking
+When you start the demo by default, it sets a `service-splitter`
+and `service-router` that divides traffic equally between the Java
+and .NET applications.
+
+Test this by calling the version API endpoint. You'll notice half the
+responses are `6.0` (.NET) and `0.0.1-SNAPSHOT` (Java). This means
+that the proxy is separating traffic between the two service
+instances for expense.
+
+```shell
+bash scripts/compose.sh split test
+```
+
+You can adjust `compose_configs/traffic_config/expense-splitter.hcl`
+with the ratio of your choice to test this further. Re-apply
+the configuration with the following command:
+
+```shell
+bash scripts/compose.sh split setup
+```
+
+#### Route Based on Header
+
+Sometimes, you want to test an application but only
+if you pass a specific header. You can set a `service-resolver`
+with a `service-router`.
+
+Set them up using the following command.
+
+```shell
+bash scripts/compose.sh route setup
+```
+
+Test this by going into the report proxy's container
+and passing a header. You'll notice that the response
+routes to `0.0.1-SNAPSHOT` (Java) if you set the header
+or `6.0` (.NET) by default.
+
+```shell
+bash scripts/compose.sh route test
+```
+
+#### Circuit Breaking
 
 To try __circuit breaking__ (outlier detection in Envoy), note that it the
 configuration requires an unsupported Consul escape hatch override. It cannot
-have any service resolver or splitter configuration. To run it, issue
-`make circuit-break`. Note that by running this command, it will delete
-existing Consul L7 configuration and redeploy the `report` service.
+have any service resolver or splitter configuration.
 
-You can run a test with `make circuit-break-test`.
-This will stop the Microsoft SQL Server database and fail calls to the .NET Core
+Stop the Microsoft SQL Server database. This will fail calls to the .NET Core
 `expense` service. As a result, circuit breaker will trip in the `report`
 service and route all traffic to the Java `expense` service.
 
-## Feature Toggling with Consul KV & consul-template
-
-To try __feature toggling__, you can trigger a toggle that enables
-the number of expense items to print out in the `report` service. Issue
-`make toggle-on` to enable and you will see a number of items listed.
+Issue the command for testing.
 
 ```shell
-> curl -s http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq
-{
-  "tripId": "d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa",
-  "expenses": [],
-  "total": 0,
-  "numberOfExpenses": 0
-}
+bash scripts/compose.sh circuit_break test
 ```
 
- Run `make toggle-off` to disable and remove the number of expense items.
+After you are done, reset the circuit breaker.
 
 ```shell
- curl -s http://localhost:5002/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq
-{
-  "tripId": "d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa",
-  "expenses": [],
-  "total": 0,
-}
+bash scripts/compose.sh circuit_break reset
 ```
 
-### Application Configuration with Consul KV
+### Clean Up
 
-To try __application configuration storage__, you can go to the Consul
-UI and examine the `configuration` path under "Key/Value". This uses
-a file format to add the `application.properties` required for a Spring
-Boot application.
+Remove everything using a command.
+
+```shell
+bash scripts/compose.sh clean
+```

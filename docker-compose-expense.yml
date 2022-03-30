@@ -1,17 +1,18 @@
 version: "3.3"
 services:
   expense-java:
-    image: joatmon08/expense:java
+    image: joatmon08/expense:java-2.6.5
     restart: always
     environment:
-      JAEGER_HOST: jaeger
+      OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://jaeger:9411/api/v2/spans
+      SPRING_CONFIG_LOCATION: /app/application.properties
     networks:
       vpcbr:
         ipv4_address: 10.5.0.4
     ports:
       - 18080:8080
   expense_proxy_java:
-    image: joatmon08/consul-envoy:v1.10.3-v1.18.4
+    image: joatmon08/consul-envoy:v1.11.4-v1.20.2
     restart: always
     environment:
       CONSUL_HTTP_ADDR: 10.5.0.2:8500
@@ -22,7 +23,7 @@ services:
     command: ["consul", "connect", "envoy","-sidecar-for", "expense-java"]
     network_mode: "service:expense-java"
   expense_agent_java:
-    image: consul:1.10.3
+    image: consul:1.11.4
     restart: always
     command: ["consul","agent","-config-file=/config/agent.hcl","-config-dir=/config"]
     volumes:
@@ -30,14 +31,14 @@ services:
     network_mode: "service:expense-java"
 
   expense-dotnet:
-    image: joatmon08/expense:dotnet
+    image: joatmon08/expense:dotnet-6.0
     networks:
       vpcbr:
         ipv4_address: 10.5.0.7
     ports:
-      - 15001:5001
+      - 15001:80
   expense_proxy_dotnet:
-    image: joatmon08/consul-envoy:v1.10.3-v1.18.4
+    image: joatmon08/consul-envoy:v1.11.4-v1.20.2
     restart: always
     environment:
       CONSUL_HTTP_ADDR: 10.5.0.2:8500
@@ -50,5 +51,4 @@ services:
 
 networks:
   vpcbr:
-    external:
-      name: expense-report_vpcbr
+    name: expense-report_vpcbr

@@ -2,12 +2,12 @@ service {
   name    = "expense"
   id      = "expense-dotnet"
   address = "10.5.0.7"
-  port    = 5001
+  port    = 80
   checks = [
     {
       id       = "expense-dotnet-http"
-      name     = "HTTP on port 5001"
-      tcp      = "10.5.0.7:5001"
+      name     = "HTTP on port 80"
+      tcp      = "10.5.0.7:80"
       interval = "30s"
       timeout  = "60s"
     }

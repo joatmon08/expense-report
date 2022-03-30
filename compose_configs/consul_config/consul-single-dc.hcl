@@ -89,6 +89,16 @@ EOF
 }
 EOF2
       }
+    },
+    {
+      kind = "service-intentions"
+      name = "*"
+      sources = [
+        {
+          name   = "*"
+          action = "deny"
+        }
+      ]
     }
   ]
 }
