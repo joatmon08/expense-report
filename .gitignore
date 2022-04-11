@@ -33,3 +33,5 @@ vault-root.json
 __pycache__
 
 !variables.env
+
+azure.json
