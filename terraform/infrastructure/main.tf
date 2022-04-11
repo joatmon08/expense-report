@@ -9,8 +9,14 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 2.17.0"
     }
+    hcp = {
+      source  = "hashicorp/hcp"
+      version = "~> 0.25.0"
+    }
   }
 }
+
+provider "hcp" {}
 
 provider "azurerm" {
   features {}
