@@ -1,5 +1,4 @@
 // Database secrets engine for MySQL
-
 resource "vault_mount" "mysql" {
   path = "${var.application}/database/mysql"
   type = "database"
@@ -22,7 +21,6 @@ resource "vault_database_secret_backend_role" "mysql" {
 }
 
 // Database secrets engine for MSSQL
-
 resource "vault_mount" "mssql" {
   path = "${var.application}/database/mssql"
   type = "database"
