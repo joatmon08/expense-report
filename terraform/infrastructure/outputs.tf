@@ -36,18 +36,10 @@ output "vault_private_endpoint" {
   value = hcp_vault_cluster.vault.vault_private_endpoint_url
 }
 
-output "vault_public_endpoint" {
-  value = hcp_vault_cluster.vault.vault_public_endpoint_url
-}
-
 output "consul_cluster_id" {
   value = hcp_consul_cluster.consul.cluster_id
 }
 
 output "consul_private_endpoint" {
   value = hcp_consul_cluster.consul.consul_private_endpoint_url
-}
-
-output "consul_public_endpoint" {
-  value = hcp_consul_cluster.consul.consul_public_endpoint_url
 }
