@@ -38,4 +38,3 @@ resource "vault_kubernetes_auth_backend_role" "mysql" {
   token_ttl                        = 3600
   token_policies                   = [vault_policy.mysql.name]
 }
-

@@ -24,7 +24,7 @@ variable "tfc_workspace" {
 variable "consul_helm_version" {
   type        = string
   description = "Consul Helm chart version"
-  default     = "0.41.1"
+  default     = "0.42.0"
 }
 
 variable "vault_helm_version" {
