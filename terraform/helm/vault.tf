@@ -4,5 +4,13 @@ resource "helm_release" "vault" {
   chart      = "vault"
   version    = var.vault_helm_version
 
-  values = [file("templates/vault.yaml")]
+  set {
+    name  = "injector.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "injector.externalVaultAddr"
+    value = local.hcp_vault_endpoint
+  }
 }
