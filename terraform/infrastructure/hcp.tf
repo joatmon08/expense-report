@@ -6,9 +6,10 @@ resource "hcp_hvn" "cloud" {
 }
 
 resource "hcp_consul_cluster" "consul" {
-  cluster_id = var.prefix
-  hvn_id     = hcp_hvn.cloud.hvn_id
-  tier       = "development"
+  cluster_id      = var.prefix
+  hvn_id          = hcp_hvn.cloud.hvn_id
+  tier            = "development"
+  public_endpoint = true
 }
 
 resource "hcp_consul_cluster_root_token" "consul" {
@@ -16,9 +17,10 @@ resource "hcp_consul_cluster_root_token" "consul" {
 }
 
 resource "hcp_vault_cluster" "vault" {
-  cluster_id = var.prefix
-  hvn_id     = hcp_hvn.cloud.hvn_id
-  tier       = "dev"
+  cluster_id      = var.prefix
+  hvn_id          = hcp_hvn.cloud.hvn_id
+  tier            = "dev"
+  public_endpoint = true
 }
 
 resource "hcp_vault_cluster_admin_token" "vault" {
