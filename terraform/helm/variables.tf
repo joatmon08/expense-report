@@ -33,6 +33,12 @@ variable "vault_helm_version" {
   default     = "0.19.0"
 }
 
+variable "grafana_helm_version" {
+  type        = string
+  description = "Vault Helm chart version"
+  default     = "6.26.0"
+}
+
 data "terraform_remote_state" "infrastructure" {
   backend = "remote"
   config = {

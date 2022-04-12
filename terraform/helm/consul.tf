@@ -1,5 +1,5 @@
 resource "helm_release" "consul" {
-  name       = "consul"
+  name = "consul"
 
   repository = "https://helm.releases.hashicorp.com"
   chart      = "consul"
