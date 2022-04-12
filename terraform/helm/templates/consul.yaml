@@ -1,0 +1,30 @@
+global:
+  enabled: false
+  name: consul
+  datacenter: expenses
+  acls:
+    manageSystemACLs: true
+    bootstrapToken:
+      secretName: expenses-bootstrap-token
+      secretKey: token
+  gossipEncryption:
+    secretName: expenses-hcp
+    secretKey: gossipEncryptionKey
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    caCert:
+      secretName: expenses-hcp
+      secretKey: caCert
+externalServers:
+  enabled: true
+  hosts: ['${CONSUL_ADDR}']
+  httpsPort: 443
+  useSystemRoots: true
+  k8sAuthMethodHost: ${K8s_HOST}
+client:
+  enabled: true
+  exposeGossipPorts: false
+  join: ['${CONSUL_ADDR}']
+connectInject:
+  enabled: true
