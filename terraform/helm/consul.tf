@@ -30,7 +30,7 @@ resource "kubernetes_secret" "hcp_consul_token" {
   }
 
   data = {
-    token = base64decode(local.consul_root_token.data.token)
+    token = local.hcp_consul_token
   }
 
   type = local.consul_root_token.type
@@ -47,22 +47,12 @@ resource "helm_release" "consul" {
   values = [
     templatefile("templates/consul.yaml", {
       CONSUL_ADDR = replace(local.hcp_consul_endpoint, "https://", "")
-      K8s_HOST    = local.kube_config.host
+      K8s_HOST    = replace(local.kube_config.host, ":443", "")
     })
   ]
 
   set {
-    name  = "controller.enabled"
-    value = "true"
-  }
-
-  set {
-    name  = "prometheus.enabled"
-    value = "true"
-  }
-
-  set {
-    name  = "controller.enabled"
-    value = "true"
+    name  = "global.image"
+    value = "hashicorp/consul-enterprise:1.11.4-ent"
   }
 }

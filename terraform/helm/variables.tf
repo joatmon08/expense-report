@@ -24,7 +24,7 @@ variable "tfc_workspace" {
 variable "consul_helm_version" {
   type        = string
   description = "Consul Helm chart version"
-  default     = "0.42.0"
+  default     = "0.41.1"
 }
 
 variable "vault_helm_version" {
@@ -48,6 +48,7 @@ locals {
   hcp_consul_cluster_id              = data.terraform_remote_state.infrastructure.outputs.consul_cluster_id
   hcp_consul_endpoint                = data.terraform_remote_state.infrastructure.outputs.consul_public_endpoint
   hcp_consul_token_kubernetes_secret = data.terraform_remote_state.infrastructure.outputs.consul_token_kubernetes_secret
+  hcp_consul_token                   = data.terraform_remote_state.infrastructure.outputs.consul_token
   hcp_vault_cluster_id               = data.terraform_remote_state.infrastructure.outputs.vault_cluster_id
   hcp_vault_endpoint                 = data.terraform_remote_state.infrastructure.outputs.vault_public_endpoint
 }
