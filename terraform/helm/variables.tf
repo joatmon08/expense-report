@@ -44,11 +44,7 @@ data "terraform_remote_state" "infrastructure" {
 }
 
 locals {
-  kube_config                        = data.terraform_remote_state.infrastructure.outputs.kube_config
-  hcp_consul_cluster_id              = data.terraform_remote_state.infrastructure.outputs.consul_cluster_id
-  hcp_consul_endpoint                = data.terraform_remote_state.infrastructure.outputs.consul_public_endpoint
-  hcp_consul_token_kubernetes_secret = data.terraform_remote_state.infrastructure.outputs.consul_token_kubernetes_secret
-  hcp_consul_token                   = data.terraform_remote_state.infrastructure.outputs.consul_token
-  hcp_vault_cluster_id               = data.terraform_remote_state.infrastructure.outputs.vault_cluster_id
-  hcp_vault_endpoint                 = data.terraform_remote_state.infrastructure.outputs.vault_public_endpoint
+  kube_config          = data.terraform_remote_state.infrastructure.outputs.kube_config
+  hcp_vault_cluster_id = data.terraform_remote_state.infrastructure.outputs.vault_cluster_id
+  hcp_vault_endpoint   = data.terraform_remote_state.infrastructure.outputs.vault_public_endpoint
 }
