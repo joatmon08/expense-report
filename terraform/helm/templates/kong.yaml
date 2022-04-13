@@ -1,0 +1,13 @@
+ingressController:
+  serviceAccount:
+    name: report-kong-proxy
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  consul.hashicorp.com/connect-inject: "true"
+  consul.hashicorp.com/enable-metrics-merging: "true"
+  consul.hashicorp.com/service-metrics-port: "8100"
+  consul.hashicorp.com/connect-service: "report-kong-proxy"
+  consul.hashicorp.com/connect-service-port: "8000"
+  consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
+  consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "8000,8443"

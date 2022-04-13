@@ -35,8 +35,14 @@ variable "vault_helm_version" {
 
 variable "grafana_helm_version" {
   type        = string
-  description = "Vault Helm chart version"
+  description = "Grafana Helm chart version"
   default     = "6.26.0"
+}
+
+variable "kong_helm_version" {
+  type        = string
+  description = "Kong Helm chart version"
+  default     = "2.7.0"
 }
 
 variable "consul_agent_ca_pem" {
