@@ -6,8 +6,6 @@ resource "vault_mount" "static" {
   description = "For ${var.application} static secrets"
 }
 
-
-
 // Create a MySQL database password for bootstrap
 resource "random_password" "mysql" {
   length           = 12

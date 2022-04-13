@@ -1,28 +1,11 @@
-variable "cluster_name" {
-  type        = string
-  description = "cluster name"
-}
-
-variable "cluster_zone" {
-  type        = string
-  description = "cluster zone from GKE"
-  default     = ""
-}
-
-variable "namespace" {
-  type        = string
-  description = "namespace for services"
-  default     = "default"
-}
-
 variable "application" {
   type        = string
   description = "application prefix for secrets"
 }
-
-variable "application_v2" {
+variable "namespace" {
   type        = string
-  description = "application (v2) name for secrets"
+  description = "namespace for services"
+  default     = "default"
 }
 
 variable "mysql_username" {
