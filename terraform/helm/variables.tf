@@ -68,5 +68,5 @@ data "terraform_remote_state" "infrastructure" {
 }
 
 locals {
-  kube_config          = data.terraform_remote_state.infrastructure.outputs.kube_config
+  kube_config = data.terraform_remote_state.infrastructure.outputs.kube_config
 }

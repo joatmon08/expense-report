@@ -1,3 +1,13 @@
+data "kubernetes_service" "consul" {
+  metadata {
+    name = "consul-ui"
+  }
+}
+
+output "consul_endpoint" {
+  value = "http://${data.kubernetes_service.consul.status.0.load_balancer.0.ingress.0.ip}"
+}
+
 data "kubernetes_service" "vault" {
   metadata {
     name = "vault-ui"
