@@ -1,16 +1,13 @@
 resource "helm_release" "vault" {
+  depends_on = [
+    helm_release.consul
+  ]
   name       = "vault"
   repository = "https://helm.releases.hashicorp.com"
   chart      = "vault"
   version    = var.vault_helm_version
 
-  set {
-    name  = "injector.enabled"
-    value = "true"
-  }
-
-  set {
-    name  = "injector.externalVaultAddr"
-    value = local.hcp_vault_endpoint
-  }
+  values = [
+    file("templates/vault.yaml")
+  ]
 }
