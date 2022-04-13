@@ -51,6 +51,12 @@ variable "consul_agent_ca_key_pem" {
   sensitive   = true
 }
 
+variable "vault_token" {
+  type = string
+  description = "Vault token for dev mode"
+  sensitive = true
+}
+
 data "terraform_remote_state" "infrastructure" {
   backend = "remote"
   config = {
