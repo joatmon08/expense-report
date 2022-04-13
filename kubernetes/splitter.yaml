@@ -5,6 +5,6 @@ metadata:
   name: expense
 spec:
   splits:
-    - weight: 100
-    - weight: 0
+    - weight: 50
+    - weight: 50
       service: expense-v2

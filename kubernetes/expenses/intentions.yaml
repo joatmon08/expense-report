@@ -17,6 +17,12 @@ spec:
           http:
             pathExact: /api
             methods: ['GET']
+    - name: report-kong-proxy
+      permissions:
+        - action: allow
+          http:
+            pathExact: /api/expense
+            methods: ['POST']
 ---
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceIntentions
@@ -36,3 +42,9 @@ spec:
           http:
             pathExact: /api
             methods: ['GET']
+    - name: report-kong-proxy
+      permissions:
+        - action: allow
+          http:
+            pathExact: /api/expense
+            methods: ['POST']

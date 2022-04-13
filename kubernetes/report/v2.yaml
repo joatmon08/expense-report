@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: report-v3
+  name: report
   labels:
     app: report
     release: v3
@@ -11,26 +11,26 @@ spec:
   selector:
     matchLabels:
       app: report
-      release: v3
+      release: v2
   template:
     metadata:
       annotations:
         prometheus.io/scrape: "true"
         consul.hashicorp.com/connect-inject: "true"
         consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
-        consul.hashicorp.com/service-meta-version: v3
+        consul.hashicorp.com/service-meta-version: v2
       labels:
         app: report
-        release: v3
+        release: v2
     spec:
       serviceAccountName: report
       containers:
         - name: report
-          image: "joatmon08/report:dotnet-v3"
+          image: "joatmon08/report:dotnet-6.0"
           ports:
-            - containerPort: 5002
+            - containerPort: 80
           livenessProbe:
             tcpSocket:
-              port: 5002
+              port: 80
             initialDelaySeconds: 30
             periodSeconds: 60

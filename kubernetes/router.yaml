@@ -14,7 +14,7 @@ spec:
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceRouter
 metadata:
-  name: report
+  name: expense
 spec:
   routes:
     - match:
@@ -23,6 +23,5 @@ spec:
             - name: x-debug
               exact: '1'
       destination:
-        service: report
-        serviceSubset: v3
+        service: expense-v2
 
