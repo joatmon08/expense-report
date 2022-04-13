@@ -1,4 +1,4 @@
-ingressController:
+deployment:
   serviceAccount:
     name: report-kong-proxy
 
