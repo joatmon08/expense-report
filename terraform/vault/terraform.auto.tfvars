@@ -1,3 +1,3 @@
-application    = "expense"
-mysql_service  = "expense-db-mysql"
-mssql_service  = "expense-db-mssql"
+application   = "expense"
+mysql_service = "expense-db-mysql"
+mssql_service = "expense-db-mssql"

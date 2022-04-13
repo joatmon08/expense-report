@@ -32,7 +32,6 @@ data "kubernetes_service" "vault" {
 }
 
 provider "vault" {
-  address   = local.hcp_vault_endpoint
-  token     = local.hcp_vault_token
-  namespace = "admin"
+  address = local.vault_endpoint
+  token   = local.vault_token
 }

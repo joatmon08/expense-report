@@ -52,9 +52,9 @@ variable "consul_agent_ca_key_pem" {
 }
 
 variable "vault_token" {
-  type = string
+  type        = string
   description = "Vault token for dev mode"
-  sensitive = true
+  sensitive   = true
 }
 
 data "terraform_remote_state" "infrastructure" {
@@ -69,6 +69,4 @@ data "terraform_remote_state" "infrastructure" {
 
 locals {
   kube_config          = data.terraform_remote_state.infrastructure.outputs.kube_config
-  hcp_vault_cluster_id = data.terraform_remote_state.infrastructure.outputs.vault_cluster_id
-  hcp_vault_endpoint   = data.terraform_remote_state.infrastructure.outputs.vault_public_endpoint
 }

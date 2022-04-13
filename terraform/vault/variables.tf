@@ -52,7 +52,7 @@ variable "tfc_workspace" {
   description = "Terraform Cloud Workspace with infrastructure"
 }
 
-data "terraform_remote_state" "infrastructure" {
+data "terraform_remote_state" "helm" {
   backend = "remote"
   config = {
     organization = var.tfc_organization
@@ -63,7 +63,7 @@ data "terraform_remote_state" "infrastructure" {
 }
 
 locals {
-  kube_config        = data.terraform_remote_state.infrastructure.outputs.kube_config
-  hcp_vault_endpoint = data.terraform_remote_state.infrastructure.outputs.vault_public_endpoint
-  hcp_vault_token    = data.terraform_remote_state.infrastructure.outputs.vault_token
+  kube_config    = data.terraform_remote_state.helm.outputs.kube_config
+  vault_endpoint = data.terraform_remote_state.helm.outputs.vault_endpoint
+  vault_token    = data.terraform_remote_state.helm.outputs.vault_token
 }

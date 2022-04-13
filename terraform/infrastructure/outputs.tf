@@ -13,18 +13,18 @@ output "kube_config" {
 }
 
 ## HCP ##
-output "vault_token" {
-  value     = hcp_vault_cluster_admin_token.vault.token
-  sensitive = true
-}
+# output "vault_token" {
+#   value     = hcp_vault_cluster_admin_token.vault.token
+#   sensitive = true
+# }
 
-output "vault_cluster_id" {
-  value = hcp_vault_cluster.vault.cluster_id
-}
+# output "vault_cluster_id" {
+#   value = hcp_vault_cluster.vault.cluster_id
+# }
 
-output "vault_public_endpoint" {
-  value = hcp_vault_cluster.vault.vault_public_endpoint_url
-}
+# output "vault_public_endpoint" {
+#   value = hcp_vault_cluster.vault.vault_public_endpoint_url
+# }
 
 
 # output "consul_token" {

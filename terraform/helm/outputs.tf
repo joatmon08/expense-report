@@ -9,6 +9,11 @@ output "vault_endpoint" {
 }
 
 output "vault_token" {
-  value = var.vault_token
+  value     = var.vault_token
+  sensitive = true
+}
+
+output "kube_config" {
+  value     = data.terraform_remote_state.infrastructure.outputs.kube_config
   sensitive = true
 }
