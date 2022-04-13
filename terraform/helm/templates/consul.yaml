@@ -1,6 +1,8 @@
 global:
   name: consul
-  datacenter: expenses
+  datacenter: eastus
+  gossipEncryption:
+    autoGenerate: true
   acls:
     manageSystemACLs: true
   metrics:

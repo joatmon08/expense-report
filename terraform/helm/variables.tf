@@ -24,7 +24,7 @@ variable "tfc_workspace" {
 variable "consul_helm_version" {
   type        = string
   description = "Consul Helm chart version"
-  default     = "0.42.0"
+  default     = "0.41.1"
 }
 
 variable "vault_helm_version" {
@@ -37,6 +37,18 @@ variable "grafana_helm_version" {
   type        = string
   description = "Vault Helm chart version"
   default     = "6.26.0"
+}
+
+variable "consul_agent_ca_pem" {
+  type        = string
+  description = "Base64 encoded CA PEM file contents for Consul agent. Use `consul tls ca create` to generate."
+  sensitive   = true
+}
+
+variable "consul_agent_ca_key_pem" {
+  type        = string
+  description = "Base64 encoded CA key PEM file contents for Consul agent. Use `consul tls ca create` to generate."
+  sensitive   = true
 }
 
 data "terraform_remote_state" "infrastructure" {
