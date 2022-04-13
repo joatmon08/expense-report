@@ -1,0 +1,38 @@
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: expense
+spec:
+  destination:
+    name: expense
+  sources:
+    - name: report
+      permissions:
+        - action: allow
+          http:
+            pathPrefix: /api/expense/trip
+            methods: ['GET']
+        - action: allow
+          http:
+            pathExact: /api
+            methods: ['GET']
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceIntentions
+metadata:
+  name: expense-v2
+spec:
+  destination:
+    name: expense-v2
+  sources:
+    - name: report
+      permissions:
+        - action: allow
+          http:
+            pathPrefix: /api/expense/trip
+            methods: ['GET']
+        - action: allow
+          http:
+            pathExact: /api
+            methods: ['GET']
