@@ -2,6 +2,8 @@ version: "3.3"
 services:
   report:
     image: joatmon08/report:dotnet-6.0
+    environment:
+      ASPNETCORE_ENVIRONMENT: Staging
     networks:
       vpcbr:
         ipv4_address: 10.5.0.5

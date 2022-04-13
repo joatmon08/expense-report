@@ -48,7 +48,8 @@ public class ReportController : ControllerBase
     };
 
     addNumItems(reportTotal);
-    addTotalReimbursable(reportTotal, items);
+    // Uncomment for report-v3 build
+    // addTotalReimbursable(reportTotal, items);
 
     return reportTotal;
   }

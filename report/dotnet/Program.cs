@@ -58,7 +58,7 @@ builder.Services.AddHttpClient<IExpenseClient, ExpenseClient>(c => {
 
 var app = builder.Build();
 
-if (app.Environment.IsProduction())
+if (app.Environment.IsProduction() || app.Environment.IsStaging())
 {
     app.UseExceptionHandler("/Error");
     app.UseForwardedHeaders();
