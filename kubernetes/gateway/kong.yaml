@@ -34,14 +34,14 @@ spec:
               service:
                 name: report
                 port:
-                  number: 5002
+                  number: 80
           - path: /api/expense
             pathType: Exact
             backend:
               service:
                 name: expense
                 port:
-                  number: 5001
+                  number: 80
 ---
 apiVersion: configuration.konghq.com/v1
 kind: KongPlugin
@@ -52,10 +52,7 @@ metadata:
 config:
   http_endpoint: http://jaeger.default.svc.cluster.local:9411/api/v2/spans
   sample_ratio: 1
-  traceid_byte_count: 16
-  header_type: preserve
-  default_header_type: b3
-  tags_header: Zipkin-Tags
+  header_type: w3c
 plugin: zipkin
 ---
 apiVersion: configuration.konghq.com/v1

@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: report
+  name: report-v3
   labels:
     app: report
     release: v3
@@ -27,6 +27,7 @@ spec:
       containers:
         - name: report
           image: "joatmon08/report:dotnet-6.0-v3"
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           livenessProbe:

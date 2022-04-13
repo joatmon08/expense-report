@@ -10,6 +10,11 @@ function report() {
     docker build --no-cache -t joatmon08/report:dotnet-${DOTNET_VERSION} -f report/dotnet/Dockerfile .
 }
 
+function report_v3() {
+    docker build --no-cache -t joatmon08/report:dotnet-${DOTNET_VERSION}-v3 -f report/dotnet/Dockerfile .
+    docker push joatmon08/report:dotnet-${DOTNET_VERSION}-v3
+}
+
 function expense() {
     docker build --no-cache -t joatmon08/expense:java-${JAVA_VERSION}  expense/java/
     docker build --no-cache -t joatmon08/expense:dotnet-${DOTNET_VERSION} expense/dotnet/
@@ -48,6 +53,10 @@ do
         ;;
         report)
         report
+        shift
+        ;;
+        report_v3)
+        report_v3
         shift
         ;;
         push)
