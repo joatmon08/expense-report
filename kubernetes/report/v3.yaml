@@ -17,6 +17,8 @@ spec:
       annotations:
         prometheus.io/scrape: "true"
         consul.hashicorp.com/connect-inject: "true"
+        consul.hashicorp.com/enable-metrics-merging: "true"
+        consul.hashicorp.com/service-metrics-port: "9464"
         consul.hashicorp.com/transparent-proxy-exclude-outbound-ports: "9411"
         consul.hashicorp.com/service-meta-version: v3
       labels:

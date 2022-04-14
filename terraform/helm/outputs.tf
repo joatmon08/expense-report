@@ -5,7 +5,7 @@ data "kubernetes_service" "consul" {
 }
 
 output "consul_endpoint" {
-  value = "http://${data.kubernetes_service.consul.status.0.load_balancer.0.ingress.0.ip}"
+  value =  try("http://${data.kubernetes_service.consul.status.0.load_balancer.0.ingress.0.ip}", "")
 }
 
 data "kubernetes_service" "vault" {
@@ -15,7 +15,7 @@ data "kubernetes_service" "vault" {
 }
 
 output "vault_endpoint" {
-  value = "http://${data.kubernetes_service.vault.status.0.load_balancer.0.ingress.0.ip}:8200"
+  value = try("http://${data.kubernetes_service.vault.status.0.load_balancer.0.ingress.0.ip}:8200", "")
 }
 
 output "vault_token" {
