@@ -54,8 +54,10 @@ function databases() {
     do
         case $arg in
             setup)
-            kubectl apply -f kubernetes/databases/
+            kubectl apply -f kubernetes/databases/intentions.yaml
+            kubectl apply -f kubernetes/databases/mssql.yaml
             kubectl rollout status deployment expense-db-mssql
+            kubectl apply -f kubernetes/databases/mysql.yaml
             kubectl rollout status deployment expense-db-mysql
             check_databases
             shift
@@ -98,7 +100,9 @@ function vault_db() {
             remove)
             vault lease revoke -f -prefix expense/database/mssql
             vault lease revoke -f -prefix expense/database/mysql
-            cd terraform/vault-app && terraform destroy
+            cd terraform/vault-app
+            terraform destroy
+            cd ../..
             shift
             ;;
             *)
