@@ -11,3 +11,20 @@ resource "helm_release" "vault" {
     file("templates/vault.yaml")
   ]
 }
+
+resource "kubernetes_manifest" "vault" {
+  depends_on = [
+    helm_release.consul
+  ]
+  manifest = {
+    "apiVersion" = "consul.hashicorp.com/v1alpha1"
+    "kind"       = "ServiceDefaults"
+    "metadata" = {
+      "name"      = "vault"
+      "namespace" = "default"
+    }
+    "spec" = {
+      "protocol" = "tcp"
+    }
+  }
+}
