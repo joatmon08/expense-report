@@ -63,7 +63,8 @@ data "terraform_remote_state" "helm" {
 }
 
 locals {
-  kube_config    = data.terraform_remote_state.helm.outputs.kube_config
-  vault_endpoint = data.terraform_remote_state.helm.outputs.vault_endpoint
-  vault_token    = data.terraform_remote_state.helm.outputs.vault_token
+  kube_config       = data.terraform_remote_state.helm.outputs.kube_config
+  consul_datacenter = data.terraform_remote_state.helm.outputs.consul_datacenter
+  vault_endpoint    = data.terraform_remote_state.helm.outputs.vault_endpoint
+  vault_token       = data.terraform_remote_state.helm.outputs.vault_token
 }
