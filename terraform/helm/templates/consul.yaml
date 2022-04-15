@@ -1,6 +1,6 @@
 global:
   name: consul
-  datacenter: eastus
+  datacenter: ${consul_datacenter}
   gossipEncryption:
     autoGenerate: true
   acls:

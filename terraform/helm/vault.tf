@@ -8,7 +8,9 @@ resource "helm_release" "vault" {
   version    = var.vault_helm_version
 
   values = [
-    file("templates/vault.yaml")
+    templatefile("templates/vault.yaml", {
+      VAULT_TOKEN = var.vault_token
+    })
   ]
 }
 

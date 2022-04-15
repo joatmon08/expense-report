@@ -8,6 +8,10 @@ output "consul_endpoint" {
   value = try("http://${data.kubernetes_service.consul.status.0.load_balancer.0.ingress.0.ip}", "")
 }
 
+output "consul_datacenter" {
+  value = var.consul_datacenter
+}
+
 data "kubernetes_service" "vault" {
   metadata {
     name = "vault-ui"

@@ -21,6 +21,8 @@ resource "helm_release" "consul" {
   version    = var.consul_helm_version
 
   values = [
-    file("templates/consul.yaml")
+    templatefile("templates/consul.yaml", {
+      consul_datacenter = var.consul_datacenter
+    })
   ]
 }

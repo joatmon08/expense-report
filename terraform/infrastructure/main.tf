@@ -5,14 +5,14 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 2.95.0"
     }
-    hcp = {
-      source  = "hashicorp/hcp"
-      version = "~> 0.25.0"
-    }
+    # hcp = {
+    #   source  = "hashicorp/hcp"
+    #   version = "~> 0.25.0"
+    # }
   }
 }
 
-provider "hcp" {}
+# provider "hcp" {}
 
 provider "azurerm" {
   features {}

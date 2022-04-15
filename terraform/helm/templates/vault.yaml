@@ -11,7 +11,7 @@ server:
     consul.hashicorp.com/transparent-proxy-exclude-inbound-ports: "8200,8201"
   dev:
     enabled: true
-    devRootToken: "root"
+    devRootToken: ${VAULT_TOKEN}
 
 ui:
   enabled: true

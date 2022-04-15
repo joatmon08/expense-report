@@ -37,7 +37,7 @@ Below are the most useful endpoints for the `report` service:
 - GET `/api/report/expense/version`: Gets the version of the expense application for debugging
 - GET `/api/report/trip/${trip_id}`: Gets a list of expenses for a given trip.
 
-`${trip_id}` denotes the trip identifer passed in the body of the expense item
+`${trip_id}` denotes the trip identifier passed in the body of the expense item
 created in the `POST` method to `expense`. Since the `report` application is
 currently only available in .NET Core, it runs by default on port `:5002`.
 ## Kubernetes
@@ -51,66 +51,90 @@ You can use the Terraform to create a Kubernetes cluster for all of the applicat
 
 - [Locust](https://locust.io/) to mimic user traffic.
 
-- Consul 1.10+
+- Consul 1.11+
 
-- Vault 1.8+
+- Vault 1.9+
 
 - Terraform 1.0+. For creating cluster and configuring Vault.
 
-### Setup
+- Azure
+  - Create a service principal with owner access to the subscription.
 
-You can run `make k8s` to deploy all of the components you'll need to run in the cluster
-to the `default` namespace.
+- Terraform Cloud account and three workspaces
+
+    - `infrastructure`: working directory under `terraform/infrastructure`
+       - Add Azure credentials
+       - `prefix` variable for identification
+
+    - `helm`: working directory under `terraform/helm`
+       - `prefix` variable for identification
+       - `vault_token` variable for logging into Vault
+       - `tfc_workspace` variable referencing `infrastructure`
+       - `tfc_organization` variable referencing your TFC organization
+
+    - `vault`: working directory under `terraform/vault`
+       - `tfc_workspace` variable referencing `helm`
+       - `tfc_organization` variable referencing your TFC organization
+
+### Create resources
+
+- Run `terraform apply` for `infrastructure` workspace
+- Run `terraform apply` for `helm` workspace
+- Run `terraform apply` for `vault` workspace
+
+### Deploy everything to Kubernetes
+
+Deploy tracing and gateway.
 
 ```shell
-$ make k8s
+bash scripts/kubernetes.sh tracing setup
 ```
 
-The order of operations __does matter__, especially because we're enabling tracing and metrics
-in the cluster.
+Deploy databases. Enter `yes` to continue.
 
-- Consul: by Helm chart, review `helm/consul.yaml` for values.
+```shell
+bash scripts/kubernetes.sh databases setup
+```
 
-- Grafana: by Helm chart, review `helm/grafana.yaml` for values. __Not in service mesh.__
-  It adds two dashboards.
-  - Expense Report (custom application dashboard)
-  - Kong (default dashboard for Kong metrics)
+Deploy expense service.
 
-- Jaeger: for tracing, review `kubernetes/jaeger.yaml`. __Not in service mesh.__
+```shell
+bash scripts/kubernetes.sh expense setup
+```
 
-- Ingress with Kong API Gateway: by Helm chart, review `helm/kong.yaml` for values.
-  It installs two plugins.
-  - Zipkin (for tracing)
-  - Prometheus (for metrics)
+Deploy report service.
 
-- Vault: by Helm chart, review `helm/consul.yaml` for values.
-  It has a configuration expressed in Terraform under `vault/` and adds the following.
-  - Database root password for MSSQL as a static secret.
-  - Database root password for MySQL as a static secret.
-  - Database secrets engine for MSSQL username and password for expense application.
-  - Database secrets engine for MySQL username and password for expense application.
+```shell
+bash scripts/kubernetes.sh report setup
+```
 
-- Microsoft SQL Server Database (MSSQL) 2019: for expense application. Table under `DemoExpenses`.
+Deploy split traffic configuration.
 
-- MySQL Database: for expense application, version 2. Table under `DemoExpenses`.
+```shell
+bash scripts/kubernetes.sh split setup
+```
 
-- Expense Application: two versions. Uses a Consul [service splitter](https://www.consul.io/docs/connect/config-entries/service-splitter)
-  to manage traffic between versions.
-  - `joatmon08/expense:dotnet`: Uses Microsoft SQL Server with a .NET Core 2.2 application.
-  - `joatmon08/expense:java-v2`: Uses MySQL with a Sprint Boot application.
+Deploy route traffic configuration.
 
-- Report Application: two versions. Uses Consul [service router](https://www.consul.io/docs/connect/config-entries/service-router)
-  to route traffic based on headers for debugging.
-  - `joatmon08/report:dotnet-v2`: Does not include a field for total reimbursable expenses.
-  - `joatmon08/report:dotnet-v3`: Does include a field for total reimbursable expenses.
+```shell
+bash scripts/kubernetes.sh route setup
+```
+
+Deploy route traffic configuration.
 
 ### Cleanup
 
-Run `make clean-k8s` to remove everything from the Kubernetes cluster.
+Remove everything from the Kubernetes cluster.
 
 ```shell
-$ make clean-k8s
+bash scripts/kubernetes.sh clean
 ```
+
+Delete everything from the `vault` TFC workspace.
+
+Delete everything from the `helm` TFC workspace.
+
+Delete everything from the `infrastructure` TFC workspace.
 
 ## Docker-Compose
 

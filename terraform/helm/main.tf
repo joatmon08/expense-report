@@ -1,9 +1,9 @@
 terraform {
   required_providers {
-    hcp = {
-      source  = "hashicorp/hcp"
-      version = "~> 0.25.0"
-    }
+    # hcp = {
+    #   source  = "hashicorp/hcp"
+    #   version = "~> 0.25.0"
+    # }
     helm = {
       source  = "hashicorp/helm"
       version = "~> 2.5"
@@ -19,7 +19,7 @@ terraform {
   }
 }
 
-provider "hcp" {}
+# provider "hcp" {}
 
 provider "kubernetes" {
   host                   = local.kube_config.host

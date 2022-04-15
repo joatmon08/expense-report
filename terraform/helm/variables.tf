@@ -27,6 +27,12 @@ variable "consul_helm_version" {
   default     = "0.41.1"
 }
 
+variable "consul_datacenter" {
+  type        = string
+  description = "Consul datacenter"
+  default     = "useast"
+}
+
 variable "vault_helm_version" {
   type        = string
   description = "Vault Helm chart version"
@@ -43,18 +49,6 @@ variable "kong_helm_version" {
   type        = string
   description = "Kong Helm chart version"
   default     = "2.7.0"
-}
-
-variable "consul_agent_ca_pem" {
-  type        = string
-  description = "Base64 encoded CA PEM file contents for Consul agent. Use `consul tls ca create` to generate."
-  sensitive   = true
-}
-
-variable "consul_agent_ca_key_pem" {
-  type        = string
-  description = "Base64 encoded CA key PEM file contents for Consul agent. Use `consul tls ca create` to generate."
-  sensitive   = true
 }
 
 variable "vault_token" {
