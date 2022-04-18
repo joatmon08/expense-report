@@ -126,8 +126,10 @@ function expense() {
             shift
             ;;
             test)
+            set -x
             curl -X POST "${INGRESS_ENDPOINT}/api/expense" \
                 -H 'Content-Type:application/json' -d @example/gas.json
+            set +x
             shift
             ;;
             remove)
@@ -181,9 +183,11 @@ function report() {
             shift
             ;;
             test)
+            set -x
             curl "${INGRESS_ENDPOINT}/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa" \
                 -H 'Content-Type:application/json'
             shift
+            set +x
             ;;
             remove)
             kubectl delete -f kubernetes/report/ --ignore-not-found
@@ -207,10 +211,14 @@ function route_traffic() {
             ;;
             test)
             echo "*** With Header ***"
-            curl -s -H 'X-Debug:1' ${INGRESS_ENDPOINT}/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
+            set -x
+            curl -s -H 'x-debug:1' ${INGRESS_ENDPOINT}/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
+            set +x
             echo ""
             echo "*** Default (No Header) ***"
+            set -x
 	        curl -s ${INGRESS_ENDPOINT}/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa | jq .
+            set +x
             shift
             ;;
             remove)
