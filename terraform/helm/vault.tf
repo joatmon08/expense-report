@@ -14,16 +14,16 @@ resource "helm_release" "vault" {
   ]
 }
 
-# resource "kubernetes_manifest" "vault" {
-#   manifest = {
-#     "apiVersion" = "consul.hashicorp.com/v1alpha1"
-#     "kind"       = "ServiceDefaults"
-#     "metadata" = {
-#       "name"      = "vault"
-#       "namespace" = "default"
-#     }
-#     "spec" = {
-#       "protocol" = "tcp"
-#     }
-#   }
-# }
+resource "kubernetes_manifest" "vault" {
+  manifest = {
+    "apiVersion" = "consul.hashicorp.com/v1alpha1"
+    "kind"       = "ServiceDefaults"
+    "metadata" = {
+      "name"      = "vault"
+      "namespace" = "default"
+    }
+    "spec" = {
+      "protocol" = "tcp"
+    }
+  }
+}
