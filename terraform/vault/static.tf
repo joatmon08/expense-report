@@ -26,6 +26,9 @@ EOT
 resource "random_password" "mssql" {
   length           = 12
   special          = true
+  min_lower        = 1
+  min_upper        = 1
+  min_numeric      = 1
   override_special = "!#"
 }
 
