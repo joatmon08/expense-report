@@ -1,0 +1,12 @@
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceResolver
+metadata:
+  name: report
+spec:
+  defaultSubset: v2
+  subsets:
+    v2:
+      filter: "Service.Meta.version == v2"
+    v3:
+      filter: "Service.Meta.version == v3"

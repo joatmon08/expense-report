@@ -120,8 +120,6 @@ Deploy route traffic configuration.
 bash scripts/kubernetes.sh route setup
 ```
 
-Deploy route traffic configuration.
-
 ### Cleanup
 
 Remove everything from the Kubernetes cluster.

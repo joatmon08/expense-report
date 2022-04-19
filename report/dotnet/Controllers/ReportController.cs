@@ -81,6 +81,7 @@ public class ReportController : ControllerBase
       reportTotal.NumberOfExpenses = reportTotal.Expenses.Count;
   }
 
+  // Uncomment for report-v3 build
   private void addTotalReimbursable(ReportTotal reportTotal, IList<ExpenseItem> items)
   {
     reportTotal.TotalReimbursable = getTotalReimbursable(items);;

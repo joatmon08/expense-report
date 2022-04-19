@@ -12,5 +12,6 @@ public class ReportTotal
 
     public int? NumberOfExpenses { get; set; }
 
+    // Uncomment for report-v3 build
     public decimal? TotalReimbursable { get; set; }
 }

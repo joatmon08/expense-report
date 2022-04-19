@@ -94,14 +94,14 @@ function vault_db() {
             setup)
             cd terraform/vault-app
             terraform init
-            terraform apply
+            terraform apply -auto-approve
             shift
             ;;
             remove)
             vault lease revoke -f -prefix expense/database/mssql
             vault lease revoke -f -prefix expense/database/mysql
             cd terraform/vault-app
-            terraform destroy
+            terraform destroy -auto-approve
             cd ../..
             shift
             ;;
@@ -128,7 +128,7 @@ function expense() {
             test)
             set -x
             curl -X POST "${INGRESS_ENDPOINT}/api/expense" \
-                -H 'Content-Type:application/json' -d @example/gas.json
+                -H 'Content-Type:application/json' -d @example/gas.json | jq .
             set +x
             shift
             ;;
@@ -180,12 +180,14 @@ function report() {
         case $arg in
             setup)
             kubectl apply -f kubernetes/report/
+            kubectl rollout status deployment report
+            kubectl rollout status deployment report-v3
             shift
             ;;
             test)
             set -x
             curl "${INGRESS_ENDPOINT}/api/report/trip/d7fd4bf6-aeb9-45a0-b671-85dfc4d095aa" \
-                -H 'Content-Type:application/json'
+                -H 'Content-Type:application/json' | jq .
             shift
             set +x
             ;;

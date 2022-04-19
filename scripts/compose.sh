@@ -106,10 +106,10 @@ function route_traffic() {
             ;;
             test)
             echo "*** With Header ***"
-            docker exec -it expense-report-report_proxy-1 curl -H 'X-Request-ID:java' 127.0.0.1:5001/api
+            docker exec -it expense-report_report_proxy_1 curl -H 'X-Request-ID:java' 127.0.0.1:5001/api
             echo ""
             echo "*** Default (No Header) ***"
-	        docker exec -it expense-report-report_proxy-1 curl 127.0.0.1:5001/api
+	        docker exec -it expense-report_report_proxy_1 curl 127.0.0.1:5001/api
             shift
             ;;
             remove)

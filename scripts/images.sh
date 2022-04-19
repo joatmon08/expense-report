@@ -12,7 +12,6 @@ function report() {
 
 function report_v3() {
     docker build --no-cache -t joatmon08/report:dotnet-${DOTNET_VERSION}-v3 -f report/dotnet/Dockerfile .
-    docker push joatmon08/report:dotnet-${DOTNET_VERSION}-v3
 }
 
 function expense() {
@@ -31,9 +30,10 @@ function database_push() {
 }
 
 function app_push() {
-    docker push joatmon08/report:dotnet-${DOTNET_VERSION}
     docker push joatmon08/expense:java-${JAVA_VERSION}
     docker push joatmon08/expense:dotnet-${DOTNET_VERSION}
+    docker push joatmon08/report:dotnet-${DOTNET_VERSION}
+    docker push joatmon08/report:dotnet-${DOTNET_VERSION}-v3
 }
 
 for arg in "$@"
