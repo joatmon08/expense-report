@@ -25,12 +25,10 @@ EOT
 
 resource "random_password" "mssql" {
   length           = 12
-  special          = true
+  special          = false
   min_lower        = 1
   min_upper        = 1
-  min_special      = 1
   min_numeric      = 1
-  override_special = "!#"
 }
 
 resource "vault_generic_secret" "mssql" {
