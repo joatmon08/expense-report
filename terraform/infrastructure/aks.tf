@@ -6,7 +6,6 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   resource_group_name             = azurerm_resource_group.resources.name
   dns_prefix                      = var.prefix
   private_cluster_enabled         = false
-  api_server_authorized_ip_ranges = concat(data.tfe_ip_ranges.addresses.api, var.client_cidr_blocks)
 
   default_node_pool {
     name           = "default"
