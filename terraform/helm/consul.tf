@@ -6,8 +6,16 @@ resource "helm_release" "consul" {
   version    = var.consul_helm_version
 
   values = [
-    templatefile("templates/consul.yaml", {
-      consul_datacenter = var.consul_datacenter
-    })
+    local.consul_helm_config
   ]
+
+  set {
+    name  = "global.image"
+    value = "hashicorp/consul:${local.consul_version}"
+  }
+
+  set {
+    name  = "controller.enabled"
+    value = "true"
+  }
 }

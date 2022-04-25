@@ -68,5 +68,8 @@ data "terraform_remote_state" "infrastructure" {
 }
 
 locals {
-  kube_config = data.terraform_remote_state.infrastructure.outputs.kube_config
+  kube_config            = data.terraform_remote_state.infrastructure.outputs.kube_config
+  consul_helm_config     = data.terraform_remote_state.infrastructure.outputs.consul_helm_config
+  consul_public_endpoint = data.terraform_remote_state.infrastructure.outputs.consul_public_endpoint
+  consul_version         = data.terraform_remote_state.infrastructure.outputs.consul_version
 }
