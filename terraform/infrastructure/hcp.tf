@@ -5,8 +5,12 @@ resource "hcp_hvn" "cloud" {
   cidr_block     = var.hcp_network_cidr_block
 }
 
+resource "random_pet" "consul" {
+  length = 1
+}
+
 resource "hcp_consul_cluster" "consul" {
-  cluster_id      = var.prefix
+  cluster_id      = random_pet.consul.id
   hvn_id          = hcp_hvn.cloud.hvn_id
   tier            = "development"
   public_endpoint = true
