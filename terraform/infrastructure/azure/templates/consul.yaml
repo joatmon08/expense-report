@@ -1,0 +1,40 @@
+global:
+  name: consul
+  datacenter: ${CONSUL_DATACENTER}
+  gossipEncryption:
+    autoGenerate: true
+  acls:
+    manageSystemACLs: true
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    caCert:
+      secretName: ${K8S_SECRET_FOR_CONSUL_CA}
+      secretKey: tls.crt
+    caKey:
+      secretName: ${K8S_SECRET_FOR_CONSUL_CA}
+      secretKey: tls.key
+
+server:
+  replicas: 3
+
+client:
+  enabled: true
+
+connectInject:
+  enabled: true
+  transparentProxy:
+    defaultEnabled: true
+
+ui:
+  enabled: true
+  service:
+    type: LoadBalancer
+
+controller:
+  enabled: true
+
+ingressGateways:
+  enabled: true
+  defaults:
+    replicas: 1
