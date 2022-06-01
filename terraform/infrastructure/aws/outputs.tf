@@ -7,7 +7,7 @@ output "region" {
 }
 
 output "eks_cluster_id" {
-  value = module.eks.cluster_id
+  value = aws_eks_cluster.cluster.id
 }
 
 output "hcp_vault_cluster" {
@@ -40,30 +40,23 @@ output "product_database_password" {
   sensitive = true
 }
 
+data "aws_eks_cluster" "cluster" {
+  name = aws_eks_cluster.cluster.id
+}
+
 data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_id
+  name = aws_eks_cluster.cluster.id
 }
 
 output "kubeconfig" {
+  sensitive = true
   value = {
     host                   = data.aws_eks_cluster.cluster.endpoint
     cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
     token                  = data.aws_eks_cluster_auth.cluster.token
+    username               = null
+    password               = null
+    client_certificate     = null
+    client_key             = null
   }
-}
-
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_id
-}
-
-
-
-provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  token                  = data.aws_eks_cluster_auth.cluster.token
-  username               = null
-  password               = null
-  client_certificate     = null
-  client_key             = null
-  cluster_ca_certificate = data.aws_eks_cluster.cluster.certificate_authority.0.data
 }

@@ -1,7 +1,7 @@
 locals {
   hcp_region                    = var.hcp_region == "" ? var.region : var.hcp_region
   route_table_ids               = concat(module.vpc.private_route_table_ids, module.vpc.public_route_table_ids)
-  hcp_consul_security_group_ids = [module.eks.cluster_primary_security_group_id]
+  hcp_consul_security_group_ids = [aws_eks_cluster.cluster.vpc_config.0.cluster_security_group_id]
 }
 
 module "hcp" {

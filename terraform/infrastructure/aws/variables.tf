@@ -49,8 +49,8 @@ variable "additional_tags" {
   description = "Tags to add resources"
 }
 
-variable "client_cidr_block" {
+variable "public_access_cidrs" {
+  default     = []
   type        = list(string)
-  description = "Client CIDR block"
-  sensitive   = true
+  description = "List of CIDR blocks to allow public access to endpoints"
 }

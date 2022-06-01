@@ -50,7 +50,6 @@ resource "aws_db_instance" "products" {
   engine                 = "postgres"
   engine_version         = "11.12"
   instance_class         = "db.t3.micro"
-  name                   = "products"
   identifier             = "${var.prefix}-products"
   username               = random_pet.database.id
   password               = random_password.database.result
